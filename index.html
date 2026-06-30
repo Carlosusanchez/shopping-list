@@ -16,44 +16,18 @@
             
             <!-- Left Controls Sidebar -->
             <section class="controls-left" aria-label="List Adjustments">
-                <button class="btn btn-orange">Add Item <span class="plus-icon">+</span></button>
-                <button class="btn btn-orange">Sort List</button>
+                <!-- Simple prompt to add items easily -->
+                <button class="btn btn-orange" id="addItemBtn">Add Item <span class="plus-icon">+</span></button>
+                <button class="btn btn-orange" id="sortBtn">Sort List</button>
                 <p class="help-text">Orders list by bullet points, numbers, or uncompleted items.</p>
             </section>
 
-            <!-- Center Shopping List Container -->
+            <!-- Center Shopping List Container (Cleared Out) -->
             <section class="list-display-box">
                 <h2 class="list-title">List Title</h2>
                 
-                <ul class="shopping-list">
-                    <!-- Standard Item -->
-                    <li class="list-item main-item">
-                        <span class="status-circle"></span>
-                        <div class="item-text-box purple-bg">Item Name</div>
-                    </li>
-                    
-                    <!-- Sub Item -->
-                    <li class="list-item sub-item">
-                        <span class="status-square"></span>
-                        <div class="item-text-box pink-bg">Sub Item Name</div>
-                    </li>
-
-                    <li class="list-item main-item">
-                        <span class="status-circle"></span>
-                        <div class="item-text-box purple-bg">Item Name</div>
-                    </li>
-
-                    <!-- Completed Crossed-Off Item Example -->
-                    <li class="list-item main-item completed">
-                        <span class="status-circle filled"></span>
-                        <div class="item-text-box purple-bg struck-through">Item Name</div>
-                    </li>
-                    
-                    <li class="list-item sub-item">
-                        <span class="status-square"></span>
-                        <div class="item-text-box pink-bg">Sub Item Name</div>
-                    </li>
-                </ul>
+                <!-- The container is empty and ready for dynamic sorting/adding -->
+                <ul class="shopping-list" id="shoppingList"></ul>
             </section>
 
             <!-- Right System Controls Sidebar -->
@@ -66,5 +40,7 @@
         </div>
     </main>
 
+    <!-- Connect the script functionality -->
+    <script src="script.js"></script>
 </body>
 </html>
