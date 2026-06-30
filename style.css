@@ -122,6 +122,8 @@ body {
     font-weight: bold;
     border-radius: 4px;
     text-align: left;
+    cursor: pointer;
+    user-select: none;
 }
 
 .purple-bg { background-color: #5b1ae2; }
@@ -129,8 +131,24 @@ body {
 
 /* Crossed Off Strikethrough Logic */
 .struck-through {
-    text-decoration: line-line-through;
     opacity: 0.6;
-    background-color: #4a12b3; /* Darker faded purple */
+    background-color: #4a12b3;
     text-decoration: line-through;
+}
+
+/* Styling updates for alternative list sorting visualizations */
+.show-numbers {
+    list-style-type: decimal !important;
+    padding-left: 20px;
+}
+
+.show-bullets {
+    list-style-type: disc !important;
+    padding-left: 20px;
+}
+
+/* Hide geometric icons when standard numbers or browser bullets are toggled */
+.show-numbers .status-circle, .show-numbers .status-square,
+.show-bullets .status-circle, .show-bullets .status-square {
+    display: none;
 }
