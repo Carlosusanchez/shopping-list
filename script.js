@@ -1,4 +1,4 @@
-let appData = {
+let appListsState = {
     "Grocery Shopping": [
         { text: "Fresh Whole Milk", completed: false },
         { text: "Organic Eggs", completed: true },
@@ -10,232 +10,200 @@ let appData = {
     ]
 };
 
-// Application view state: defaults directly to the dashboard
-let currentView = "home";
+// Global App View Manager Route Path Tracking Index Context
+let activeRoutePath = "home";
 
-// DOM Hook Registry
+// Core Static Layout Mounting Frame Node Hooks Registry
 const mainDisplayBox = document.getElementById('mainDisplayBox');
 const leftSidebar = document.getElementById('leftSidebar');
-const addItemBtn = document.getElementById('addItemBtn');
-const sortBtn = document.getElementById('sortBtn');
+const rightSidebar = document.getElementById('rightSidebar');
 const homeLink = document.getElementById('homeLink');
 
-// Navigation Button Hooks
-const newListBtn = document.getElementById('newListBtn');
-const dashboardBtn = document.getElementById('dashboardBtn');
-const deleteListBtn = document.getElementById('deleteListBtn');
+// Main Framework Routing Master Renderer Switch Engine
+function renderApplicationLayout() {
+    // 1. Clear out sidebars completely to prevent dead node reference listener errors
+    leftSidebar.innerHTML = '';
+    rightSidebar.innerHTML = '';
+    mainDisplayBox.innerHTML = '';
 
-// Primary Interface Layout Switcher Engine
-function updateAppView() {
-    if (currentView === "home") {
-        leftSidebar.style.visibility = "hidden";
-        deleteListBtn.style.display = "none";
-        renderHomepageDashboard();
+    if (activeRoutePath === "home") {
+        buildHomepageWorkspace();
     } else {
-        leftSidebar.style.visibility = "visible";
-        deleteListBtn.style.display = "block";
-        renderActiveShoppingList();
+        buildActiveListWorkspace();
     }
 }
 
-// 🏠 SCREEN ONE: Simple Cohesive Homepage Dashboard Layout
-function renderHomepageDashboard() {
-    mainDisplayBox.innerHTML = '';
+// 🏠 PAGE PANEL ONE: Build Pure Theme Cohesive Grid Homepage Screen Panel Environment
+function buildHomepageWorkspace() {
+    // Generate Right Panel Context Controls
+    const newListBtn = document.createElement('button');
+    newListBtn.className = 'btn btn-blue';
+    newListBtn.textContent = 'New List';
+    newListBtn.addEventListener('click', handleCreateNewCategoryList);
+    rightSidebar.appendChild(newListBtn);
 
-    const container = document.createElement('div');
-    container.className = 'homepage-container';
+    // Build Central Dashboard Content Frame Canvas Elements
+    const homeWrap = document.createElement('div');
+    homeWrap.className = 'homepage-container';
 
-    const title = document.createElement('h2');
-    title.className = 'list-title';
-    title.textContent = "Your Shopping Lists";
-    container.appendChild(title);
+    const mainHeaderTitle = document.createElement('h2');
+    mainHeaderTitle.className = 'list-title';
+    mainHeaderTitle.textContent = "Your Shopping Boards";
+    homeWrap.appendChild(mainHeaderTitle);
 
-    const grid = document.createElement('div');
-    grid.className = 'dashboard-grid';
+    const cardsGrid = document.createElement('div');
+    cardsGrid.className = 'dashboard-grid';
 
-    const listKeys = Object.keys(appData);
+    const trackingKeys = Object.keys(appListsState);
 
-    if (listKeys.length === 0) {
-        const noLists = document.createElement('div');
-        noLists.className = 'no-lists-message';
-        noLists.textContent = "No lists found. Click 'New List' on the right panel to get started!";
-        grid.appendChild(noLists);
+    if (trackingKeys.length === 0) {
+        const structuralEmptyRow = document.createElement('div');
+        structuralEmptyRow.className = 'no-lists-message';
+        structuralEmptyRow.textContent = "Your workspace dashboard is clear. Click 'New List' on the right panel to initialize a new tracker.";
+        cardsGrid.appendChild(structuralEmptyRow);
     } else {
-        listKeys.forEach(listName => {
-            const card = document.createElement('div');
-            card.className = 'list-card';
+        trackingKeys.forEach(listKeyName => {
+            const listCardNode = document.createElement('div');
+            listCardNode.className = 'list-card';
             
-            const count = appData[listName].length;
-            card.innerHTML = `
-                <div class="list-card-title">${listName}</div>
-                <div class="list-card-count">${count} item${count === 1 ? '' : 's'}</div>
+            const internalCountSize = appListsState[listKeyName].length;
+            listCardNode.innerHTML = `
+                <div class="list-card-title">${listKeyName}</div>
+                <div class="list-card-count">${internalCountSize} item${internalCountSize === 1 ? '' : 's'} logged</div>
             `;
 
-            card.addEventListener('click', () => {
-                currentView = listName;
-                updateAppView();
+            // Wire Card Navigation Switch Actions Trigger Events
+            listCardNode.addEventListener('click', () => {
+                activeRoutePath = listKeyName;
+                renderApplicationLayout();
             });
 
-            grid.appendChild(card);
+            cardsGrid.appendChild(listCardNode);
         });
     }
 
-    container.appendChild(grid);
-    mainDisplayBox.appendChild(container);
+    homeWrap.appendChild(cardsGrid);
+    mainDisplayBox.appendChild(homeWrap);
 }
 
-// 🛒 SCREEN TWO: Active List Rendering Environment
-function renderActiveShoppingList() {
-    mainDisplayBox.innerHTML = '';
+// 🛒 PAGE PANEL TWO: Build Contextual Interactive Shopping Board Screen Panel
+function buildActiveListWorkspace() {
+    // A. Populate Left Control Sidebar Dashboard Elements Panel Node Rows
+    const addItemBtn = document.createElement('button');
+    addItemBtn.className = 'btn btn-orange';
+    addItemBtn.innerHTML = 'Add Item <span class="plus-icon">+</span>';
+    addItemBtn.addEventListener('click', handleAddNewRowItemRowItem);
+    leftSidebar.appendChild(addItemBtn);
 
-    // Render list header title correctly
-    const listTitle = document.createElement('h2');
-    listTitle.className = 'list-title';
-    listTitle.textContent = currentView;
-    mainDisplayBox.appendChild(listTitle);
+    const sortBtn = document.createElement('button');
+    sortBtn.className = 'btn btn-orange';
+    sortBtn.textContent = 'Sort List';
+    sortBtn.addEventListener('click', handleAdvancedSortingWorkflowMenu);
+    leftSidebar.appendChild(sortBtn);
 
-    const ul = document.createElement('ul');
-    ul.className = 'shopping-list';
+    // B. Populate Right Control Sidebar Dashboard Elements Panel Node Rows
+    const rightNewListBtn = document.createElement('button');
+    rightNewListBtn.className = 'btn btn-blue';
+    rightNewListBtn.textContent = 'New List';
+    rightNewListBtn.addEventListener('click', handleCreateNewCategoryList);
+    rightSidebar.appendChild(rightNewListBtn);
 
-    const items = appData[currentView];
+    const homepageReturnBtn = document.createElement('button');
+    homepageReturnBtn.className = 'btn btn-teal';
+    homepageReturnBtn.textContent = 'Go to Homepage';
+    homepageReturnBtn.addEventListener('click', () => {
+        activeRoutePath = "home";
+        renderApplicationLayout();
+    });
+    rightSidebar.appendChild(homepageReturnBtn);
 
-    // Build the list element wrapper
-    if (!items || items.length === 0) {
-        const emptyMsg = document.createElement('p');
-        emptyMsg.style.color = '#777';
-        emptyMsg.style.fontStyle = 'italic';
-        emptyMsg.style.marginTop = '40px';
-        emptyMsg.textContent = "This list has no items yet. Click 'Add Item' to start!";
-        mainDisplayBox.appendChild(emptyMsg);
+    const purgeListBtn = document.createElement('button');
+    purgeListBtn.className = 'btn btn-red delete-btn';
+    purgeListBtn.textContent = 'Delete Current List';
+    purgeListBtn.addEventListener('click', handlePurgeActiveCategoryRecordMap);
+    rightSidebar.appendChild(purgeListBtn);
+
+    // C. Build Central Whiteboard Active Item Elements Rows Dashboard Canvas Setup
+    const currentActiveHeaderName = activeRoutePath;
+    const itemsDataArray = appListsState[currentActiveHeaderName];
+
+    // Build Interactive Mutable Title Header Component View Setup Panel Nodes
+    const titleHeaderNode = document.createElement('h2');
+    titleHeaderNode.className = 'list-title editable-title-hint';
+    titleHeaderNode.textContent = currentActiveHeaderName;
+    titleHeaderNode.title = "Click to rename this list category title header instantly";
+    titleHeaderNode.addEventListener('click', () => {
+        const renamedInputTitle = prompt("Provide fresh nomenclature identification for this tracking list dashboard:", currentActiveHeaderName);
+        if (renamedInputTitle !== null && renamedInputTitle.trim() !== "" && renamedInputTitle.trim() !== currentActiveHeaderName) {
+            const formattedNewTitle = renamedInputTitle.trim();
+            if (appListsState[formattedNewTitle]) {
+                alert("A tracking data block register with that property key already exists.");
+                return;
+            }
+            // Transition background keys memory state values seamlessly without data loss
+            appListsState[formattedNewTitle] = appListsState[currentActiveHeaderName];
+            delete appListsState[currentActiveHeaderName];
+            activeRoutePath = formattedNewTitle;
+            renderApplicationLayout();
+        }
+    });
+    mainDisplayBox.appendChild(titleHeaderNode);
+
+    const targetListContainerUl = document.createElement('ul');
+    targetListContainerUl.className = 'shopping-list';
+
+    if (!itemsDataArray || itemsDataArray.length === 0) {
+        const emptyAlertNoticeText = document.createElement('p');
+        emptyAlertNoticeText.style.color = '#777';
+        emptyAlertNoticeText.style.fontStyle = 'italic';
+        emptyAlertNoticeText.style.marginTop = '40px';
+        emptyAlertNoticeText.textContent = "This active list collection dashboard has no records. Click 'Add Item' on the left panel to populate rows.";
+        mainDisplayBox.appendChild(emptyAlertNoticeText);
     } else {
-        items.forEach((item, index) => {
-            const li = document.createElement('li');
-            li.className = 'list-item';
+        itemsDataArray.forEach((itemObject, recordIndex) => {
+            const liNodeRowElement = document.createElement('li');
+            liNodeRowElement.className = 'list-item';
 
-            // 1. Interactive Checkbox Built-In
-            const checkBox = document.createElement('div');
-            checkBox.className = 'status-square';
-            if (item.completed) {
-                checkBox.style.backgroundColor = '#2ecc71';
-                checkBox.style.borderColor = '#2ecc71';
-                checkBox.innerHTML = '✓';
+            // 1. Square Completion Checkbox Indicator Factory Block
+            const statusCheckboxSquareBox = document.createElement('div');
+            statusCheckboxSquareBox.className = 'status-square';
+            if (itemObject.completed) {
+                statusCheckboxSquareBox.style.backgroundColor = '#2ecc71';
+                statusCheckboxSquareBox.style.borderColor = '#2ecc71';
+                statusCheckboxSquareBox.innerHTML = '✓';
             }
-            checkBox.addEventListener('click', (e) => {
+            statusCheckboxSquareBox.addEventListener('click', (e) => {
                 e.stopPropagation();
-                item.completed = !item.completed;
-                updateAppView();
+                itemObject.completed = !itemObject.completed;
+                renderApplicationLayout();
             });
-            li.appendChild(checkBox);
+            liNodeRowElement.appendChild(statusCheckboxSquareBox);
 
-            // 2. Click-to-Edit Text Input Block
-            const textBox = document.createElement('div');
-            textBox.className = 'item-text-box';
-            textBox.textContent = item.text;
-            if (item.completed) {
-                textBox.classList.add('struck-through');
+            // 2. Colored Horizontal Text Description Blocks Frame Component Wrapper
+            const elementTextBoxCanvas = document.createElement('div');
+            elementTextBoxCanvas.className = 'item-text-box';
+            elementTextBoxCanvas.textContent = itemObject.text;
+            if (itemObject.completed) {
+                elementTextBoxCanvas.classList.add('struck-through');
             }
-            textBox.addEventListener('click', () => {
-                const newName = prompt("Rename your entry text:", item.text);
-                if (newName !== null && newName.trim() !== "") {
-                    item.text = newName.trim();
-                    updateAppView();
+            // Inline Single Item Mutation Edit Action Handler Row Trigger
+            elementTextBoxCanvas.addEventListener('click', () => {
+                const promptMutateTextStringValue = prompt("Modify current selected line context record parameter name:", itemObject.text);
+                if (promptMutateTextStringValue !== null && promptMutateTextStringValue.trim() !== "") {
+                    itemObject.text = promptMutateTextStringValue.trim();
+                    renderApplicationLayout();
                 }
             });
-            li.appendChild(textBox);
+            liNodeRowElement.appendChild(elementTextBoxCanvas);
 
-            // 3. Absolute Single Row Deletion Anchor
-            const deleteItemBtn = document.createElement('button');
-            deleteItemBtn.className = 'delete-item-btn';
-            deleteItemBtn.innerHTML = '×';
-            deleteItemBtn.addEventListener('click', (e) => {
+            // 3. Independent Single Row Destruction Pin Cross Button Component
+            const individualItemPurgeBtn = document.createElement('button');
+            individualItemPurgeBtn.className = 'delete-item-btn';
+            individualItemPurgeBtn.innerHTML = '×';
+            individualItemPurgeBtn.title = "Drop item record row";
+            individualItemPurgeBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                appData[currentView].splice(index, 1);
-                updateAppView();
+                appListsState[activeRoutePath].splice(recordIndex, 1);
+                renderApplicationLayout();
             });
-            li.appendChild(deleteItemBtn);
-
-            ul.appendChild(li);
-        });
-        
-        mainDisplayBox.appendChild(ul);
-    }
-}
-
-/* --- EVENT LIFECYCLE LISTENERS --- */
-
-// Left Panel Actions
-addItemBtn.addEventListener('click', () => {
-    if (currentView === "home") return;
-    const itemText = prompt("Enter the name of your new item:");
-    if (!itemText || itemText.trim() === "") return;
-
-    appData[currentView].push({ text: itemText.trim(), completed: false });
-    updateAppView();
-});
-
-sortBtn.addEventListener('click', () => {
-    if (currentView === "home") return;
-
-    const method = prompt(
-        "Choose sorting approach strategy option number:\n" +
-        "1: Sort Alphabetically (A to Z)\n" +
-        "2: Sort by Checked Off status (Open items to top)\n" +
-        "3: Combine both (Open Alphabetical first, then Checked Alphabetical)"
-    );
-
-    const listRef = appData[currentView];
-
-    if (method === '1') {
-        listRef.sort((a, b) => a.text.localeCompare(b.text));
-    } else if (method === '2') {
-        listRef.sort((a, b) => a.completed - b.completed);
-    } else if (method === '3') {
-        listRef.sort((a, b) => {
-            if (a.completed !== b.completed) return a.completed - b.completed;
-            return a.text.localeCompare(b.text);
-        });
-    } else if (method !== null) {
-        alert("Invalid sorting selection choice entry.");
-        return;
-    }
-    updateAppView();
-});
-
-// Right Panel Actions
-newListBtn.addEventListener('click', () => {
-    const listTitle = prompt("Enter a unique title heading for your new list:");
-    if (!listTitle || listTitle.trim() === "") return;
-
-    const refinedTitle = listTitle.trim();
-    if (appData[refinedTitle]) {
-        alert("A list under that specified title properties already exists!");
-        return;
-    }
-
-    appData[refinedTitle] = [];
-    currentView = refinedTitle;
-    updateAppView();
-});
-
-dashboardBtn.addEventListener('click', () => {
-    currentView = "home";
-    updateAppView();
-});
-
-homeLink.addEventListener('click', () => {
-    currentView = "home";
-    updateAppView();
-});
-
-deleteListBtn.addEventListener('click', () => {
-    if (currentView === "home") return;
-    const check = confirm(`Are you completely sure you want to permanently delete "${currentView}"?`);
-    if (!check) return;
-
-    delete appData[currentView];
-    currentView = "home";
-    updateAppView();
-});
-
-// Start the runtime lifecycle sequence
-updateAppView();
+            liNodeRowElement.appendChild(individualItemPurgeBtn);
