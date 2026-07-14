@@ -1,4 +1,3 @@
-// Object map holding persistent data collections across runtime
 let appListsData = {
     "Weekly Groceries": [
         { text: "Fresh Milk", completed: false },
@@ -98,7 +97,25 @@ function renderActiveShoppingList() {
     // List Header Context
     const title = document.createElement('h2');
     title.className = 'list-title';
+    title.style.cursor = 'pointer';
     title.textContent = currentView;
+    title.title = "Click to rename this list";
+    
+    title.addEventListener('click', () => {
+        const newListName = prompt("Enter a new name for this list:", currentView);
+        if (!newListName || newListName.trim() === "" || newListName.trim() === currentView) return;
+        
+        const cleanName = newListName.trim();
+        if (appListsData[cleanName]) {
+            alert("A list with that name already exists!");
+            return;
+        }
+
+        appListsData[cleanName] = appListsData[currentView];
+        delete appListsData[currentView];
+        currentView = cleanName;
+        renderInterface();
+    });
     mainDisplayBox.appendChild(title);
 
     // Structured List Wrapper Elements Container
@@ -129,7 +146,7 @@ function renderActiveShoppingList() {
             }
 
             checkBox.addEventListener('click', (e) => {
-                e.stopPropagation(); // Shield baseline block edits triggers on toggle interactions
+                e.stopPropagation(); 
                 item.completed = !item.completed;
                 renderInterface();
             });
@@ -153,18 +170,8 @@ function renderActiveShoppingList() {
                 }
             });
             li.appendChild(textBox);
-            const deleteItemBtn = document.createElement('button');
-            deleteItemBtn.className = 'delete-item-btn';
-            deleteItemBtn.innerHTML = '×';
-            deleteItemBtn.title = 'Remove item from list';
-            deleteItemBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); // Prevents triggering the text box rename prompt
-                appListsData[currentView].splice(index, 1); // Removes the item from the data array
-                renderInterface(); // Re-draws the list with the item gone
-            });
-            li.appendChild(deleteItemBtn);
 
-            // 3. Independent Destruction Element Target Button
+            // 3. Independent Destruction Element Target Button (Integrated Cleanly)
             const deleteItemBtn = document.createElement('button');
             deleteItemBtn.className = 'delete-item-btn';
             deleteItemBtn.innerHTML = '×';
@@ -241,7 +248,6 @@ newListBtn.addEventListener('click', () => {
         return;
     }
 
-    // Allocate configuration canvas registers map properties objects
     appListsData[parsedName] = [];
     currentView = parsedName;
     renderInterface();
@@ -261,15 +267,3 @@ deleteListBtn.addEventListener('click', () => {
     if (!userConfirmation) return;
 
     delete appListsData[currentView];
-    currentView = "home"; // Redirect user context safely to main landing layouts panel view space
-    renderInterface();
-});
-
-// Bind top document headline text elements layout triggers to invoke homepage view properties rerouting
-homeLink.addEventListener('click', () => {
-    currentView = "home";
-    renderInterface();
-});
-
-// Initialize Framework Application runtime loop sequences on load configurations mapping instances
-renderInterface();
