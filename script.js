@@ -153,6 +153,16 @@ function renderActiveShoppingList() {
                 }
             });
             li.appendChild(textBox);
+            const deleteItemBtn = document.createElement('button');
+            deleteItemBtn.className = 'delete-item-btn';
+            deleteItemBtn.innerHTML = '×';
+            deleteItemBtn.title = 'Remove item from list';
+            deleteItemBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevents triggering the text box rename prompt
+                appListsData[currentView].splice(index, 1); // Removes the item from the data array
+                renderInterface(); // Re-draws the list with the item gone
+            });
+            li.appendChild(deleteItemBtn);
 
             // 3. Independent Destruction Element Target Button
             const deleteItemBtn = document.createElement('button');
