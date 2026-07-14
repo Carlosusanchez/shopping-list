@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Shopping List</title>
+    <title>Digital Shopping Tracker</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <main class="app-container">
-        <!-- Main Application Title (Clicking returns to Home) -->
-        <h1 class="main-title" id="homeLink" style="cursor: pointer;">Digital Shopping Tracker</h1>
+        <!-- Main Application Title -->
+        <h1 class="main-title" id="homeLink">Digital Shopping Tracker</h1>
 
         <div class="interface-layout">
             
@@ -20,28 +20,16 @@
                 <button class="btn btn-orange" id="sortBtn">Sort List</button>
             </section>
 
-            <!-- Center Display Area -->
-            <section class="list-display-box">
-                
-                <!-- 🏠 VIEW 1: HOME PAGE CONTAINER -->
-                <div id="homePageContainer">
-                    <h2 class="list-title">Select a Shopping List</h2>
-                    <div class="dashboard-grid" id="homepageGrid"></div>
-                </div>
-
-                <!-- 🛒 VIEW 2: ACTIVE SHOPPING LIST CONTAINER -->
-                <div id="shoppingListContainer" style="display: none;">
-                    <h2 class="list-title" id="listTitleElement">List Title</h2>
-                    <ul class="shopping-list" id="shoppingList"></ul>
-                </div>
-
+            <!-- Center Display Board Container -->
+            <section class="list-display-box" id="mainDisplayBox">
+                <!-- Content will dynamically switch between Home Dashboard and Active Lists -->
             </section>
 
             <!-- Right System Controls Sidebar -->
             <section class="controls-right" aria-label="List Management">
                 <button class="btn btn-blue" id="newListBtn">New List</button>
-                <button class="btn btn-teal" id="goHomeBtn">Go to Homepage</button>
-                <button class="btn btn-red delete-btn" id="deleteListBtn">Delete List</button>
+                <button class="btn btn-teal" id="changeListBtn">Go to Dashboard</button>
+                <button class="btn btn-red delete-btn" id="deleteListBtn">Delete Current List</button>
             </section>
 
         </div>
