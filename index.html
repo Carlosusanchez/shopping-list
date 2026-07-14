@@ -3,36 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Shopping List</title>
+    <title>Digital Shopping Tracker</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <main class="app-container">
         <!-- Main Application Title -->
-        <h1 class="main-title">Digital Shopping List</h1>
+        <h1 class="main-title" id="homeLink">Digital Shopping Tracker</h1>
 
         <div class="interface-layout">
             
             <!-- Left Controls Sidebar -->
-            <section class="controls-left" aria-label="List Adjustments">
+            <section class="controls-left" id="leftSidebar" aria-label="List Adjustments">
                 <button class="btn btn-orange" id="addItemBtn">Add Item <span class="plus-icon">+</span></button>
                 <button class="btn btn-orange" id="sortBtn">Sort List</button>
             </section>
 
-            <!-- Center Shopping List Container -->
-            <section class="list-display-box">
-                <h2 class="list-title">List Title</h2>
-                
-                <!-- This container is empty and ready for dynamic sorting -->
-                <ul class="shopping-list" id="shoppingList"></ul>
+            <!-- Center Display Board Container -->
+            <section class="list-display-box" id="mainDisplayBox">
+                <!-- Content will dynamically switch between Home Dashboard and Active Lists -->
             </section>
 
             <!-- Right System Controls Sidebar -->
             <section class="controls-right" aria-label="List Management">
-                <button class="btn btn-blue">New List</button>
-                <button class="btn btn-teal">Change List</button>
-                <button class="btn btn-red delete-btn">Delete List</button>
+                <button class="btn btn-blue" id="newListBtn">New List</button>
+                <button class="btn btn-teal" id="changeListBtn">Go to Dashboard</button>
+                <button class="btn btn-red delete-btn" id="deleteListBtn">Delete Current List</button>
             </section>
 
         </div>
@@ -42,15 +39,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-.delete-item-btn {
-    background: transparent;
-    border: none;
-    color: #ff3333;
-    font-size: 1.2rem;
-    cursor: pointer;
-    padding: 0 5px;
-    font-weight: bold;
-}
-.delete-item-btn:hover {
-    transform: scale(1.2);
-}
