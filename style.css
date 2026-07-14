@@ -17,13 +17,10 @@ body {
     font-size: 2.5rem;
     margin-bottom: 20px;
     cursor: pointer;
-    transition: opacity 0.2s;
+    user-select: none;
 }
 
-.main-title:hover {
-    opacity: 0.8;
-}
-
+/* Three Column App Grid Layout */
 .interface-layout {
     display: flex;
     justify-content: space-between;
@@ -31,7 +28,7 @@ body {
     gap: 20px;
 }
 
-
+/* Sidebars Formatting */
 .controls-left, .controls-right {
     display: flex;
     flex-direction: column;
@@ -39,7 +36,7 @@ body {
     width: 200px;
 }
 
-
+/* Buttons Theme Styling */
 .btn {
     padding: 12px 20px;
     border: none;
@@ -48,11 +45,6 @@ body {
     font-weight: bold;
     cursor: pointer;
     font-size: 1rem;
-    transition: transform 0.1s;
-}
-
-.btn:active {
-    transform: scale(0.97);
 }
 
 .btn-orange { background-color: #ff7a22; }
@@ -60,7 +52,7 @@ body {
 .btn-teal { background-color: #4cd3c2; }
 .btn-red { background-color: #ff3333; }
 
-/* Central Workspace Board */
+/* Central White Board Container */
 .list-display-box {
     flex-grow: 1;
     background: white;
@@ -78,7 +70,7 @@ body {
     margin-bottom: 25px;
 }
 
-
+/* Core Shopping List Formatting */
 .shopping-list {
     list-style: none;
     padding: 0;
@@ -94,7 +86,7 @@ body {
     gap: 15px;
 }
 
-
+/* Small Square Checkbox Box */
 .status-square {
     width: 18px;
     height: 18px;
@@ -112,7 +104,7 @@ body {
     border-radius: 3px;
 }
 
-
+/* Item Text Canvas Blocks */
 .item-text-box {
     flex-grow: 1;
     padding: 10px 20px;
@@ -122,17 +114,17 @@ body {
     text-align: left;
     cursor: pointer;
     user-select: none;
-    background-color: #5b1ae2; 
+    background-color: #5b1ae2;
 }
 
-
+/* Crossed Off Strikethrough Logic */
 .struck-through {
     opacity: 0.6;
     background-color: #4a12b3 !important;
     text-decoration: line-through;
 }
 
-
+/* Delete Item button (The small red cross inside item row) */
 .delete-item-btn {
     background: transparent;
     border: none;
@@ -143,49 +135,64 @@ body {
     padding: 0 5px;
     line-height: 1;
 }
-
 .delete-item-btn:hover {
     transform: scale(1.2);
 }
 
+/* --- TRUE HOMEPAGE STYLING --- */
+.homepage-container {
+    text-align: left;
+}
+
+.welcome-banner {
+    background: #5b1ae2;
+    color: white;
+    padding: 20px;
+    border-radius: 6px;
+    margin-bottom: 30px;
+}
+
+.welcome-banner h3 { margin: 0 0 5px 0; }
+.welcome-banner p { margin: 0; opacity: 0.9; font-size: 0.95rem; }
 
 .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 15px;
-    margin-top: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
 }
 
-.dashboard-card {
+.list-card {
     background: #f4f7f6;
     border: 2px solid #5b1ae2;
-    padding: 20px 10px;
+    padding: 25px 15px;
     border-radius: 8px;
+    text-align: center;
     cursor: pointer;
-    font-weight: bold;
-    color: #333;
-    transition: all 0.2s ease;
-    word-break: break-word;
+    transition: all 0.2s ease-in-out;
 }
 
-.dashboard-card:hover {
+.list-card:hover {
     background: #5b1ae2;
     color: white;
-    transform: translateY(-3px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    transform: translateY(-4px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
-.dashboard-empty-text {
-    color: #777;
-    font-style: italic;
-    margin-top: 40px;
-}
-
-.home-nav-indicator {
-    display: inline-block;
-    color: #5b1ae2;
+.list-card-title {
     font-weight: bold;
-    cursor: pointer;
-    margin-bottom: 15px;
-    text-decoration: underline;
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+}
+
+.list-card-count {
+    font-size: 0.85rem;
+    opacity: 0.7;
+}
+
+.no-lists-message {
+    color: #666;
+    font-style: italic;
+    text-align: center;
+    grid-column: 1 / -1;
+    padding: 40px 0;
 }
