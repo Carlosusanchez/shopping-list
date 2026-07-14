@@ -3,51 +3,57 @@ const shoppingList = document.getElementById('shoppingList');
 const addItemBtn = document.getElementById('addItemBtn');
 const sortBtn = document.getElementById('sortBtn');
 
-// Hardcoded sample dataset to initialize the application view
-const initialItems = [
-    { text: "Milk", type: "main", completed: false },
-    { text: "Organic Whole Milk", type: "sub", completed: false },
-    { text: "Eggs", type: "main", completed: true },
-    { text: "Bread", type: "main", completed: false }
+// Array to hold shopping list item data
+let itemsData = [
+    { text: "Milk", completed: false },
+    { text: "Eggs", completed: true },
+    { text: "Bread", completed: false }
 ];
 
 // Helper function to build and render a list item DOM element
-function createListItemElement(item) {
+function createListItemElement(item, index) {
     const li = document.createElement('li');
     li.className = 'list-item';
-    if (item.type === 'sub') {
-        li.classList.add('sub-item');
-    }
 
-    // Create the appropriate geometric bullet indicator
-    const bullet = document.createElement('span');
-    if (item.type === 'main') {
-        bullet.className = item.completed ? 'status-circle filled' : 'status-circle';
+    // 1. Create the checkbox container (the small square box)
+    const checkBox = document.createElement('div');
+    checkBox.className = 'status-square';
+    
+    // Add custom styling inline to handle the green check mark when completed
+    if (item.completed) {
+        checkBox.style.backgroundColor = '#2ecc71';
+        checkBox.style.borderColor = '#2ecc71';
+        checkBox.style.position = 'relative';
+        checkBox.innerHTML = '<span style="color: white; font-size: 12px; position: absolute; top: -1px; left: 3px;">✓</span>';
     } else {
-        bullet.className = 'status-square'; // Sub-items get squares
+        checkBox.style.backgroundColor = 'transparent';
+        checkBox.innerHTML = '';
     }
-    li.appendChild(bullet);
 
-    // Create the colored text block
+    // Toggle complete/incomplete when clicking the square box
+    checkBox.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevents triggering the text edit behavior
+        item.completed = !item.completed;
+        renderList();
+    });
+    li.appendChild(checkBox);
+
+    // 2. Create the text container block
     const textBox = document.createElement('div');
-    textBox.className = 'item-text-box';
-    textBox.className += item.type === 'main' ? ' purple-bg' : ' pink-bg';
+    textBox.className = 'item-text-box purple-bg';
     textBox.textContent = item.text;
 
-    // Apply strikethrough states if active
+    // Apply strikethrough logic if completed
     if (item.completed) {
         textBox.classList.add('struck-through');
     }
 
-    // Toggle completion status on click
+    // Inline Edit Feature: Click the text block to rename the item
     textBox.addEventListener('click', () => {
-        item.completed = !item.completed;
-        if (item.completed) {
-            textBox.classList.add('struck-through');
-            if (item.type === 'main') bullet.className = 'status-circle filled';
-        } else {
-            textBox.classList.remove('struck-through');
-            if (item.type === 'main') bullet.className = 'status-circle';
+        const updatedText = prompt('Edit your item name:', item.text);
+        if (updatedText !== null && updatedText.trim() !== '') {
+            item.text = updatedText.trim();
+            renderList();
         }
     });
 
@@ -56,37 +62,33 @@ function createListItemElement(item) {
 }
 
 // Function to render the complete array data into the view container
-function renderList(itemsArray) {
+function renderList() {
     shoppingList.innerHTML = '';
-    itemsArray.forEach(item => {
-        const itemElement = createListItemElement(item);
+    itemsData.forEach((item, index) => {
+        const itemElement = createListItemElement(item, index);
         shoppingList.appendChild(itemElement);
     });
 }
 
-// Event Listener: Add new item or sub-item
+// Event Listener: Add new item via prompt window
 addItemBtn.addEventListener('click', () => {
-    const text = prompt('Enter item name:');
+    const text = prompt('Enter new item name:');
     if (!text || text.trim() === '') return;
 
-    const isSub = confirm('Is this a sub-item under the previous main entry?');
-    
     const newItem = {
         text: text.trim(),
-        type: isSub ? 'sub' : 'main',
         completed: false
     };
 
-    initialItems.push(newItem);
-    renderList(initialItems);
+    itemsData.push(newItem);
+    renderList();
 });
 
 // Event Listener: Sort elements alphabetically
 sortBtn.addEventListener('click', () => {
-    // Sort array by text value
-    initialItems.sort((a, b) => a.text.localeCompare(b.text));
-    renderList(initialItems);
+    itemsData.sort((a, b) => a.text.localeCompare(b.text));
+    renderList();
 });
 
-// Initial application boot load
-renderList(initialItems);
+// Initial boot load to populate list
+renderList();
