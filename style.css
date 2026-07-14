@@ -145,3 +145,16 @@ body {
 .show-bullets .status-circle, .show-bullets .status-square {
     display: none;
 }
+/* Delete icon button inside list item */
+.delete-item-btn {
+    background: transparent;
+    border: none;
+    color: #ff3333;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0 5px;
+    font-weight: bold;
+}
+.delete-item-btn:hover {
+    transform: scale(1.2);
+}
