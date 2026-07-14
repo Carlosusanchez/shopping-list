@@ -1,190 +1,92 @@
-javascript// DOM Element Selectors
+// DOM Element Selectors
 const shoppingList = document.getElementById('shoppingList');
 const addItemBtn = document.getElementById('addItemBtn');
 const sortBtn = document.getElementById('sortBtn');
-const listTitle = document.querySelector('.list-title');
 
-// Right System Controls Sidebar Buttons
-const newListBtn = document.querySelector('.btn-blue');
-const changeListBtn = document.querySelector('.btn-teal');
-const deleteListBtn = document.querySelector('.delete-btn');
+// Hardcoded sample dataset to initialize the application view
+const initialItems = [
+    { text: "Milk", type: "main", completed: false },
+    { text: "Organic Whole Milk", type: "sub", completed: false },
+    { text: "Eggs", type: "main", completed: true },
+    { text: "Bread", type: "main", completed: false }
+];
 
-// Application Data State
-let lists = {
-    "Groceries": [
-        { text: "Milk", completed: false },
-        { text: "Eggs", completed: true },
-        { text: "Bread", completed: false }
-    ],
-    "Hardware": [
-        { text: "Hammer", completed: false },
-        { text: "Nails", completed: false }
-    ]
-};
-let currentListName = "Groceries";
-
-// Helper function to build and render a single list item
-function createListItemElement(item, index) {
+// Helper function to build and render a list item DOM element
+function createListItemElement(item) {
     const li = document.createElement('li');
     li.className = 'list-item';
-
-    // 1. Checkbox container (small square box)
-    const checkBox = document.createElement('div');
-    checkBox.className = 'status-square';
-    
-    if (item.completed) {
-        checkBox.style.backgroundColor = '#2ecc71';
-        checkBox.style.borderColor = '#2ecc71';
-        checkBox.style.position = 'relative';
-        checkBox.innerHTML = '<span style="color: white; font-size: 12px; position: absolute; top: -1px; left: 3px;">✓</span>';
-    } else {
-        checkBox.style.backgroundColor = 'transparent';
-        checkBox.innerHTML = '';
+    if (item.type === 'sub') {
+        li.classList.add('sub-item');
     }
 
-    checkBox.addEventListener('click', (e) => {
-        e.stopPropagation();
-        item.completed = !item.completed;
-        renderList();
-    });
-    li.appendChild(checkBox);
+    // Create the appropriate geometric bullet indicator
+    const bullet = document.createElement('span');
+    if (item.type === 'main') {
+        bullet.className = item.completed ? 'status-circle filled' : 'status-circle';
+    } else {
+        bullet.className = 'status-square'; // Sub-items get squares
+    }
+    li.appendChild(bullet);
 
-    // 2. Text container block
+    // Create the colored text block
     const textBox = document.createElement('div');
-    textBox.className = 'item-text-box purple-bg';
+    textBox.className = 'item-text-box';
+    textBox.className += item.type === 'main' ? ' purple-bg' : ' pink-bg';
     textBox.textContent = item.text;
 
+    // Apply strikethrough states if active
     if (item.completed) {
         textBox.classList.add('struck-through');
     }
 
-    // Inline Edit Feature
+    // Toggle completion status on click
     textBox.addEventListener('click', () => {
-        const updatedText = prompt('Edit your item name:', item.text);
-        if (updatedText !== null && updatedText.trim() !== '') {
-            item.text = updatedText.trim();
-            renderList();
+        item.completed = !item.completed;
+        if (item.completed) {
+            textBox.classList.add('struck-through');
+            if (item.type === 'main') bullet.className = 'status-circle filled';
+        } else {
+            textBox.classList.remove('struck-through');
+            if (item.type === 'main') bullet.className = 'status-circle';
         }
     });
+
     li.appendChild(textBox);
-
-    // 3. Delete single item action button
-    const deleteItemBtn = document.createElement('button');
-    deleteItemBtn.className = 'delete-item-btn';
-    deleteItemBtn.innerHTML = '×';
-    deleteItemBtn.title = 'Delete Item';
-    deleteItemBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        lists[currentListName].splice(index, 1);
-        renderList();
-    });
-    li.appendChild(deleteItemBtn);
-
     return li;
 }
 
-// Function to render the active list to the DOM
-function renderList() {
+// Function to render the complete array data into the view container
+function renderList(itemsArray) {
     shoppingList.innerHTML = '';
-    listTitle.textContent = currentListName;
-    
-    const currentItems = lists[currentListName];
-    if (!currentItems || currentItems.length === 0) return;
-
-    currentItems.forEach((item, index) => {
-        const itemElement = createListItemElement(item, index);
+    itemsArray.forEach(item => {
+        const itemElement = createListItemElement(item);
         shoppingList.appendChild(itemElement);
     });
 }
 
-// Left Sidebar: Add item
+// Event Listener: Add new item or sub-item
 addItemBtn.addEventListener('click', () => {
-    const text = prompt('Enter new item name:');
+    const text = prompt('Enter item name:');
     if (!text || text.trim() === '') return;
 
-    lists[currentListName].push({
+    const isSub = confirm('Is this a sub-item under the previous main entry?');
+    
+    const newItem = {
         text: text.trim(),
+        type: isSub ? 'sub' : 'main',
         completed: false
-    });
-    renderList();
+    };
+
+    initialItems.push(newItem);
+    renderList(initialItems);
 });
 
-// Left Sidebar: Multi-option sorting selection prompt
+// Event Listener: Sort elements alphabetically
 sortBtn.addEventListener('click', () => {
-    const choice = prompt(
-        "Choose sorting option:\n" +
-        "1 - Sort Alphabetically\n" +
-        "2 - Sort by Checked Off Status\n" +
-        "3 - Sort by both (Unchecked Alphabetical first, then Checked Alphabetical)"
-    );
-
-    const currentItems = lists[currentListName];
-
-    if (choice === '1') {
-        currentItems.sort((a, b) => a.text.localeCompare(b.text));
-    } else if (choice === '2') {
-        currentItems.sort((a, b) => a.completed - b.completed);
-    } else if (choice === '3') {
-        currentItems.sort((a, b) => {
-            if (a.completed !== b.completed) {
-                return a.completed - b.completed;
-            }
-            return a.text.localeCompare(b.text);
-        });
-    } else {
-        alert("Invalid option selected.");
-        return;
-    }
-    renderList();
+    // Sort array by text value
+    initialItems.sort((a, b) => a.text.localeCompare(b.text));
+    renderList(initialItems);
 });
 
-// Right Sidebar: Create a new list while retaining active structures
-newListBtn.addEventListener('click', () => {
-    const newName = prompt('Enter a name for your new shopping list:');
-    if (!newName || newName.trim() === '') return;
-
-    const formattedName = newName.trim();
-    if (lists[formattedName]) {
-        alert('A list with that name already exists!');
-        return;
-    }
-
-    lists[formattedName] = [];
-    currentListName = formattedName;
-    renderList();
-});
-
-// Right Sidebar: Toggle layout selection between previously built active states
-changeListBtn.addEventListener('click', () => {
-    const availableLists = Object.keys(lists);
-    const selection = prompt(
-        `Available lists:\n${availableLists.join('\n')}\n\nType the exact name of the list you want to switch to:`
-    );
-
-    if (selection && lists[selection.trim()]) {
-        currentListName = selection.trim();
-        renderList();
-    } else if (selection) {
-        alert("List name not found.");
-    }
-});
-
-// Right Sidebar: Purge active layout list
-deleteListBtn.addEventListener('click', () => {
-    const confirmDelete = confirm(`Are you sure you want to delete the complete list "${currentListName}"?`);
-    if (!confirmDelete) return;
-
-    delete lists[currentListName];
-    const availableLists = Object.keys(lists);
-
-    if (availableLists.length > 0) {
-        currentListName = availableLists[0];
-    } else {
-        lists["Default List"] = [];
-        currentListName = "Default List";
-    }
-    renderList();
-});
-
-// Initial boot launch sequence
-renderList();
+// Initial application boot load
+renderList(initialItems);
