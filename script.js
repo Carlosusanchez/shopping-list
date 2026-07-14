@@ -10,50 +10,46 @@ let appData = {
     ]
 };
 
-// Controls view rendering environment: "home" or name of an active list string
+// Application view state: defaults directly to the dashboard
 let currentView = "home";
 
-// DOM Node Registry Hooks
+// DOM Hook Registry
 const mainDisplayBox = document.getElementById('mainDisplayBox');
 const leftSidebar = document.getElementById('leftSidebar');
 const addItemBtn = document.getElementById('addItemBtn');
 const sortBtn = document.getElementById('sortBtn');
 const homeLink = document.getElementById('homeLink');
 
-// Right Sidebar Button Hooks
+// Navigation Button Hooks
 const newListBtn = document.getElementById('newListBtn');
 const dashboardBtn = document.getElementById('dashboardBtn');
 const deleteListBtn = document.getElementById('deleteListBtn');
 
-// View Controller Engine: Renders layout matching current application path
+// Primary Interface Layout Switcher Engine
 function updateAppView() {
     if (currentView === "home") {
-        // Homepage Layout Setup: Hide left item toolbars and right delete buttons
         leftSidebar.style.visibility = "hidden";
         deleteListBtn.style.display = "none";
         renderHomepageDashboard();
     } else {
-        // Inside List Layout Setup: Show item management toolbars
         leftSidebar.style.visibility = "visible";
         deleteListBtn.style.display = "block";
         renderActiveShoppingList();
     }
 }
 
-// 🏠 SCREEN ONE: True Homepage Grid Board Rendering
+// 🏠 SCREEN ONE: Simple Cohesive Homepage Dashboard Layout
 function renderHomepageDashboard() {
     mainDisplayBox.innerHTML = '';
 
-    // Create welcoming banner wrap
     const container = document.createElement('div');
     container.className = 'homepage-container';
 
-    const banner = document.createElement('div');
-    banner.className = 'welcome-banner';
-    banner.innerHTML = `<h3>Welcome back!</h3><p>Select any list below to manage your items, or click 'New List' to start a new one.</p>`;
-    container.appendChild(banner);
+    const title = document.createElement('h2');
+    title.className = 'list-title';
+    title.textContent = "Your Shopping Lists";
+    container.appendChild(title);
 
-    // Grid tracking layout
     const grid = document.createElement('div');
     grid.className = 'dashboard-grid';
 
@@ -62,7 +58,7 @@ function renderHomepageDashboard() {
     if (listKeys.length === 0) {
         const noLists = document.createElement('div');
         noLists.className = 'no-lists-message';
-        noLists.textContent = "Your dashboard is clean. Click 'New List' to create your first tracker tracker.";
+        noLists.textContent = "No lists found. Click 'New List' on the right panel to get started!";
         grid.appendChild(noLists);
     } else {
         listKeys.forEach(listName => {
@@ -72,10 +68,9 @@ function renderHomepageDashboard() {
             const count = appData[listName].length;
             card.innerHTML = `
                 <div class="list-card-title">${listName}</div>
-                <div class="list-card-count">${count} item${count === 1 ? '' : 's'} logged</div>
+                <div class="list-card-count">${count} item${count === 1 ? '' : 's'}</div>
             `;
 
-            // Click card to open that list view
             card.addEventListener('click', () => {
                 currentView = listName;
                 updateAppView();
@@ -89,10 +84,11 @@ function renderHomepageDashboard() {
     mainDisplayBox.appendChild(container);
 }
 
-// 🛒 SCREEN TWO: Render Inside an Active Shopping List View
+// 🛒 SCREEN TWO: Active List Rendering Environment
 function renderActiveShoppingList() {
     mainDisplayBox.innerHTML = '';
 
+    // Render list header title correctly
     const listTitle = document.createElement('h2');
     listTitle.className = 'list-title';
     listTitle.textContent = currentView;
@@ -103,70 +99,71 @@ function renderActiveShoppingList() {
 
     const items = appData[currentView];
 
+    // Build the list element wrapper
     if (!items || items.length === 0) {
         const emptyMsg = document.createElement('p');
         emptyMsg.style.color = '#777';
         emptyMsg.style.fontStyle = 'italic';
-        emptyMsg.textContent = "This list has no items yet. Use 'Add Item' to build your list.";
+        emptyMsg.style.marginTop = '40px';
+        emptyMsg.textContent = "This list has no items yet. Click 'Add Item' to start!";
         mainDisplayBox.appendChild(emptyMsg);
-        return;
-    }
+    } else {
+        items.forEach((item, index) => {
+            const li = document.createElement('li');
+            li.className = 'list-item';
 
-    items.forEach((item, index) => {
-        const li = document.createElement('li');
-        li.className = 'list-item';
-
-        // 1. Checkbox Element Factory
-        const checkBox = document.createElement('div');
-        checkBox.className = 'status-square';
-        if (item.completed) {
-            checkBox.style.backgroundColor = '#2ecc71';
-            checkBox.style.borderColor = '#2ecc71';
-            checkBox.innerHTML = '✓';
-        }
-        checkBox.addEventListener('click', (e) => {
-            e.stopPropagation();
-            item.completed = !item.completed;
-            updateAppView();
-        });
-        li.appendChild(checkBox);
-
-        // 2. Click-to-Edit Text Container Block
-        const textBox = document.createElement('div');
-        textBox.className = 'item-text-box';
-        textBox.textContent = item.text;
-        if (item.completed) {
-            textBox.classList.add('struck-through');
-        }
-        textBox.addEventListener('click', () => {
-            const newName = prompt("Rename your entry text:", item.text);
-            if (newName !== null && newName.trim() !== "") {
-                item.text = newName.trim();
-                updateAppView();
+            // 1. Interactive Checkbox Built-In
+            const checkBox = document.createElement('div');
+            checkBox.className = 'status-square';
+            if (item.completed) {
+                checkBox.style.backgroundColor = '#2ecc71';
+                checkBox.style.borderColor = '#2ecc71';
+                checkBox.innerHTML = '✓';
             }
+            checkBox.addEventListener('click', (e) => {
+                e.stopPropagation();
+                item.completed = !item.completed;
+                updateAppView();
+            });
+            li.appendChild(checkBox);
+
+            // 2. Click-to-Edit Text Input Block
+            const textBox = document.createElement('div');
+            textBox.className = 'item-text-box';
+            textBox.textContent = item.text;
+            if (item.completed) {
+                textBox.classList.add('struck-through');
+            }
+            textBox.addEventListener('click', () => {
+                const newName = prompt("Rename your entry text:", item.text);
+                if (newName !== null && newName.trim() !== "") {
+                    item.text = newName.trim();
+                    updateAppView();
+                }
+            });
+            li.appendChild(textBox);
+
+            // 3. Absolute Single Row Deletion Anchor
+            const deleteItemBtn = document.createElement('button');
+            deleteItemBtn.className = 'delete-item-btn';
+            deleteItemBtn.innerHTML = '×';
+            deleteItemBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                appData[currentView].splice(index, 1);
+                updateAppView();
+            });
+            li.appendChild(deleteItemBtn);
+
+            ul.appendChild(li);
         });
-        li.appendChild(textBox);
-
-        // 3. Delete Single Entry Button
-        const deleteItemBtn = document.createElement('button');
-        deleteItemBtn.className = 'delete-item-btn';
-        deleteItemBtn.innerHTML = '×';
-        deleteItemBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            appData[currentView].splice(index, 1);
-            updateAppView();
-        });
-        li.appendChild(deleteItemBtn);
-
-        ul.appendChild(li);
-    });
-
-    mainDisplayBox.appendChild(ul);
+        
+        mainDisplayBox.appendChild(ul);
+    }
 }
 
-/* --- EVENT LISTENERS & ACTION MANAGEMENT --- */
+/* --- EVENT LIFECYCLE LISTENERS --- */
 
-// Left Panel: Add individual checklist row
+// Left Panel Actions
 addItemBtn.addEventListener('click', () => {
     if (currentView === "home") return;
     const itemText = prompt("Enter the name of your new item:");
@@ -176,7 +173,6 @@ addItemBtn.addEventListener('click', () => {
     updateAppView();
 });
 
-// Left Panel: Multi-option sorting processor
 sortBtn.addEventListener('click', () => {
     if (currentView === "home") return;
 
@@ -205,7 +201,7 @@ sortBtn.addEventListener('click', () => {
     updateAppView();
 });
 
-// Right Panel: Create a completely new list structure
+// Right Panel Actions
 newListBtn.addEventListener('click', () => {
     const listTitle = prompt("Enter a unique title heading for your new list:");
     if (!listTitle || listTitle.trim() === "") return;
@@ -221,17 +217,16 @@ newListBtn.addEventListener('click', () => {
     updateAppView();
 });
 
-// Right Panel / Header Link: Route user view context to home grid maps
 dashboardBtn.addEventListener('click', () => {
     currentView = "home";
     updateAppView();
 });
+
 homeLink.addEventListener('click', () => {
     currentView = "home";
     updateAppView();
 });
 
-// Right Panel: Purges whole category
 deleteListBtn.addEventListener('click', () => {
     if (currentView === "home") return;
     const check = confirm(`Are you completely sure you want to permanently delete "${currentView}"?`);
@@ -242,5 +237,5 @@ deleteListBtn.addEventListener('click', () => {
     updateAppView();
 });
 
-// Run app init engine cycle
+// Start the runtime lifecycle sequence
 updateAppView();
