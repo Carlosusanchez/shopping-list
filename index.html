@@ -9,32 +9,24 @@
 <body>
 
     <main class="app-container">
-        <!-- Title links back to homepage -->
+        <!-- Main Application Header - Clicking this safely routes back to Homepage -->
         <h1 class="main-title" id="homeLink">Digital Shopping Tracker</h1>
 
         <div class="interface-layout">
             
-            <!-- Left Controls Sidebar (hidden on Homepage) -->
-            <section class="controls-left" id="leftSidebar" aria-label="List Adjustments">
-                <button class="btn btn-orange" id="addItemBtn">Add Item <span class="plus-icon">+</span></button>
-                <button class="btn btn-orange" id="sortBtn">Sort List</button>
-            </section>
+            <!-- Left Side Control Panel Interface Dynamic Slot -->
+            <section class="controls-left" id="leftSidebar" aria-label="List Adjustments"></section>
 
-            <!-- Center Display Area -->
-            <section class="list-display-box" id="mainDisplayBox">
-                <!-- Dynamic Content Injected Here -->
-            </section>
+            <!-- Center White Board Content Container Area -->
+            <section class="list-display-box" id="mainDisplayBox"></section>
 
-            <!-- Right System Controls Sidebar -->
-            <section class="controls-right" aria-label="List Management">
-                <button class="btn btn-blue" id="newListBtn">New List</button>
-                <button class="btn btn-teal" id="dashboardBtn">Go to Homepage</button>
-                <button class="btn btn-red delete-btn" id="deleteListBtn">Delete Current List</button>
-            </section>
+            <!-- Right Side Control Panel Interface Dynamic Slot -->
+            <section class="controls-right" id="rightSidebar" aria-label="List Management"></section>
 
         </div>
     </main>
 
+    <!-- Code Injector Function Engine Link -->
     <script src="script.js"></script>
 </body>
 </html>
