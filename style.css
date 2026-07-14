@@ -18,9 +18,10 @@ body {
     margin-bottom: 20px;
     cursor: pointer;
     user-select: none;
+    color: #333;
 }
 
-/* Three Column App Grid Layout */
+/* Three Column Layout Grid */
 .interface-layout {
     display: flex;
     justify-content: space-between;
@@ -28,7 +29,6 @@ body {
     gap: 20px;
 }
 
-/* Sidebars Formatting */
 .controls-left, .controls-right {
     display: flex;
     flex-direction: column;
@@ -36,7 +36,7 @@ body {
     width: 200px;
 }
 
-/* Buttons Theme Styling */
+/* Side Buttons */
 .btn {
     padding: 12px 20px;
     border: none;
@@ -52,7 +52,7 @@ body {
 .btn-teal { background-color: #4cd3c2; }
 .btn-red { background-color: #ff3333; }
 
-/* Central White Board Container */
+/* Central Work Board Container */
 .list-display-box {
     flex-grow: 1;
     background: white;
@@ -68,9 +68,10 @@ body {
     font-size: 1.8rem;
     margin-top: 0;
     margin-bottom: 25px;
+    color: #333;
 }
 
-/* Core Shopping List Formatting */
+/* List Items Formatting */
 .shopping-list {
     list-style: none;
     padding: 0;
@@ -86,7 +87,7 @@ body {
     gap: 15px;
 }
 
-/* Small Square Checkbox Box */
+/* Custom Interactive Square Checkbox */
 .status-square {
     width: 18px;
     height: 18px;
@@ -104,7 +105,7 @@ body {
     border-radius: 3px;
 }
 
-/* Item Text Canvas Blocks */
+/* Horizontal Colored Text Canvas Blocks */
 .item-text-box {
     flex-grow: 1;
     padding: 10px 20px;
@@ -124,7 +125,7 @@ body {
     text-decoration: line-through;
 }
 
-/* Delete Item button (The small red cross inside item row) */
+/* Delete Item Pin Button */
 .delete-item-btn {
     background: transparent;
     border: none;
@@ -135,64 +136,56 @@ body {
     padding: 0 5px;
     line-height: 1;
 }
+
 .delete-item-btn:hover {
     transform: scale(1.2);
 }
 
-/* --- TRUE HOMEPAGE STYLING --- */
+/* --- SIMPLE HOMEPAGE COHESIVE PALETTE STYLING --- */
 .homepage-container {
-    text-align: left;
+    text-align: center;
 }
-
-.welcome-banner {
-    background: #5b1ae2;
-    color: white;
-    padding: 20px;
-    border-radius: 6px;
-    margin-bottom: 30px;
-}
-
-.welcome-banner h3 { margin: 0 0 5px 0; }
-.welcome-banner p { margin: 0; opacity: 0.9; font-size: 0.95rem; }
 
 .dashboard-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 20px;
+    margin-top: 10px;
 }
 
+/* Homepage cards share the exact same deep purple signature color as list blocks */
 .list-card {
-    background: #f4f7f6;
-    border: 2px solid #5b1ae2;
+    background: #5b1ae2;
+    color: white;
     padding: 25px 15px;
-    border-radius: 8px;
+    border-radius: 6px;
     text-align: center;
     cursor: pointer;
-    transition: all 0.2s ease-in-out;
+    font-weight: bold;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: none;
 }
 
 .list-card:hover {
-    background: #5b1ae2;
-    color: white;
     transform: translateY(-4px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgba(91, 26, 226, 0.3);
+    background-color: #4a12b3;
 }
 
 .list-card-title {
-    font-weight: bold;
     font-size: 1.2rem;
     margin-bottom: 8px;
 }
 
 .list-card-count {
     font-size: 0.85rem;
-    opacity: 0.7;
+    opacity: 0.8;
+    font-weight: normal;
 }
 
 .no-lists-message {
     color: #666;
     font-style: italic;
-    text-align: center;
     grid-column: 1 / -1;
     padding: 40px 0;
 }
