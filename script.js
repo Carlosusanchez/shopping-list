@@ -1,25 +1,36 @@
-// DOM Element Selectors
 const shoppingList = document.getElementById('shoppingList');
 const addItemBtn = document.getElementById('addItemBtn');
 const sortBtn = document.getElementById('sortBtn');
+const listTitle = document.querySelector('.list-title');
 
-// Array to hold shopping list item data
-let itemsData = [
-    { text: "Milk", completed: false },
-    { text: "Eggs", completed: true },
-    { text: "Bread", completed: false }
-];
+// Right System Controls Sidebar Buttons
+const newListBtn = document.querySelector('.btn-blue');
+const changeListBtn = document.querySelector('.btn-teal');
+const deleteListBtn = document.querySelector('.delete-btn');
 
-// Helper function to build and render a list item DOM element
+// Application Data State
+let lists = {
+    "Groceries": [
+        { text: "Milk", completed: false },
+        { text: "Eggs", completed: true },
+        { text: "Bread", completed: false }
+    ],
+    "Hardware": [
+        { text: "Hammer", completed: false },
+        { text: "Nails", completed: false }
+    ]
+};
+let currentListName = "Groceries";
+
+// Helper function to build and render a single list item
 function createListItemElement(item, index) {
     const li = document.createElement('li');
     li.className = 'list-item';
 
-    // 1. Create the checkbox container (the small square box)
+    // 1. Checkbox container (small square box)
     const checkBox = document.createElement('div');
     checkBox.className = 'status-square';
     
-    // Add custom styling inline to handle the green check mark when completed
     if (item.completed) {
         checkBox.style.backgroundColor = '#2ecc71';
         checkBox.style.borderColor = '#2ecc71';
@@ -30,25 +41,23 @@ function createListItemElement(item, index) {
         checkBox.innerHTML = '';
     }
 
-    // Toggle complete/incomplete when clicking the square box
     checkBox.addEventListener('click', (e) => {
-        e.stopPropagation(); // Prevents triggering the text edit behavior
+        e.stopPropagation();
         item.completed = !item.completed;
         renderList();
     });
     li.appendChild(checkBox);
 
-    // 2. Create the text container block
+    // 2. Text container block
     const textBox = document.createElement('div');
     textBox.className = 'item-text-box purple-bg';
     textBox.textContent = item.text;
 
-    // Apply strikethrough logic if completed
     if (item.completed) {
         textBox.classList.add('struck-through');
     }
 
-    // Inline Edit Feature: Click the text block to rename the item
+    // Inline Edit Feature
     textBox.addEventListener('click', () => {
         const updatedText = prompt('Edit your item name:', item.text);
         if (updatedText !== null && updatedText.trim() !== '') {
@@ -56,39 +65,125 @@ function createListItemElement(item, index) {
             renderList();
         }
     });
-
     li.appendChild(textBox);
+
+    // 3. Delete single item action button
+    const deleteItemBtn = document.createElement('button');
+    deleteItemBtn.className = 'delete-item-btn';
+    deleteItemBtn.innerHTML = '×';
+    deleteItemBtn.title = 'Delete Item';
+    deleteItemBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        lists[currentListName].splice(index, 1);
+        renderList();
+    });
+    li.appendChild(deleteItemBtn);
+
     return li;
 }
 
-// Function to render the complete array data into the view container
+// Function to render the active list to the DOM
 function renderList() {
     shoppingList.innerHTML = '';
-    itemsData.forEach((item, index) => {
+    listTitle.textContent = currentListName;
+    
+    const currentItems = lists[currentListName];
+    if (!currentItems || currentItems.length === 0) return;
+
+    currentItems.forEach((item, index) => {
         const itemElement = createListItemElement(item, index);
         shoppingList.appendChild(itemElement);
     });
 }
 
-// Event Listener: Add new item via prompt window
+// Left Sidebar: Add item
 addItemBtn.addEventListener('click', () => {
     const text = prompt('Enter new item name:');
     if (!text || text.trim() === '') return;
 
-    const newItem = {
+    lists[currentListName].push({
         text: text.trim(),
         completed: false
-    };
-
-    itemsData.push(newItem);
+    });
     renderList();
 });
 
-// Event Listener: Sort elements alphabetically
+// Left Sidebar: Multi-option sorting selection prompt
 sortBtn.addEventListener('click', () => {
-    itemsData.sort((a, b) => a.text.localeCompare(b.text));
+    const choice = prompt(
+        "Choose sorting option:\n" +
+        "1 - Sort Alphabetically\n" +
+        "2 - Sort by Checked Off Status\n" +
+        "3 - Sort by both (Unchecked Alphabetical first, then Checked Alphabetical)"
+    );
+
+    const currentItems = lists[currentListName];
+
+    if (choice === '1') {
+        currentItems.sort((a, b) => a.text.localeCompare(b.text));
+    } else if (choice === '2') {
+        currentItems.sort((a, b) => a.completed - b.completed);
+    } else if (choice === '3') {
+        currentItems.sort((a, b) => {
+            if (a.completed !== b.completed) {
+                return a.completed - b.completed;
+            }
+            return a.text.localeCompare(b.text);
+        });
+    } else {
+        alert("Invalid option selected.");
+        return;
+    }
     renderList();
 });
 
-// Initial boot load to populate list
+// Right Sidebar: Create a new list while retaining active structures
+newListBtn.addEventListener('click', () => {
+    const newName = prompt('Enter a name for your new shopping list:');
+    if (!newName || newName.trim() === '') return;
+
+    const formattedName = newName.trim();
+    if (lists[formattedName]) {
+        alert('A list with that name already exists!');
+        return;
+    }
+
+    lists[formattedName] = [];
+    currentListName = formattedName;
+    renderList();
+});
+
+// Right Sidebar: Toggle layout selection between previously built active states
+changeListBtn.addEventListener('click', () => {
+    const availableLists = Object.keys(lists);
+    const selection = prompt(
+        `Available lists:\n${availableLists.join('\n')}\n\nType the exact name of the list you want to switch to:`
+    );
+
+    if (selection && lists[selection.trim()]) {
+        currentListName = selection.trim();
+        renderList();
+    } else if (selection) {
+        alert("List name not found.");
+    }
+});
+
+// Right Sidebar: Purge active layout list
+deleteListBtn.addEventListener('click', () => {
+    const confirmDelete = confirm(`Are you sure you want to delete the complete list "${currentListName}"?`);
+    if (!confirmDelete) return;
+
+    delete lists[currentListName];
+    const availableLists = Object.keys(lists);
+
+    if (availableLists.length > 0) {
+        currentListName = availableLists[0];
+    } else {
+        lists["Default List"] = [];
+        currentListName = "Default List";
+    }
+    renderList();
+});
+
+// Initial boot launch sequence
 renderList();
