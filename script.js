@@ -1,264 +1,246 @@
-let appListsData = {
-    "Weekly Groceries": [
-        { text: "Fresh Milk", completed: false },
+let appData = {
+    "Grocery Shopping": [
+        { text: "Fresh Whole Milk", completed: false },
         { text: "Organic Eggs", completed: true },
-        { text: "Whole Wheat Bread", completed: false }
+        { text: "Sourdough Bread", completed: false }
     ],
-    "Home Improvement": [
+    "Weekend Hardware": [
         { text: "Steel Hammer", completed: false },
         { text: "Galvanized Nails", completed: false }
     ]
 };
 
-// Variable tracking active rendering pane context ('home' or a specific list string name)
-let currentView = "home"; 
+// Controls view rendering environment: "home" or name of an active list string
+let currentView = "home";
 
-// DOM Element Registry Mapping hooks
+// DOM Node Registry Hooks
 const mainDisplayBox = document.getElementById('mainDisplayBox');
 const leftSidebar = document.getElementById('leftSidebar');
 const addItemBtn = document.getElementById('addItemBtn');
 const sortBtn = document.getElementById('sortBtn');
 const homeLink = document.getElementById('homeLink');
 
-// Navigation management hooks
+// Right Sidebar Button Hooks
 const newListBtn = document.getElementById('newListBtn');
-const changeListBtn = document.getElementById('changeListBtn');
+const dashboardBtn = document.getElementById('dashboardBtn');
 const deleteListBtn = document.getElementById('deleteListBtn');
 
-// Primary UI Switch Routing engine
-function renderInterface() {
+// View Controller Engine: Renders layout matching current application path
+function updateAppView() {
     if (currentView === "home") {
-        // Hide list adjustment controls when on the home menu
+        // Homepage Layout Setup: Hide left item toolbars and right delete buttons
         leftSidebar.style.visibility = "hidden";
         deleteListBtn.style.display = "none";
-        renderHomeDashboard();
+        renderHomepageDashboard();
     } else {
-        // Display list contextual settings 
+        // Inside List Layout Setup: Show item management toolbars
         leftSidebar.style.visibility = "visible";
         deleteListBtn.style.display = "block";
         renderActiveShoppingList();
     }
 }
 
-// Render Engine: Home Dashboard Grid
-function renderHomeDashboard() {
+// 🏠 SCREEN ONE: True Homepage Grid Board Rendering
+function renderHomepageDashboard() {
     mainDisplayBox.innerHTML = '';
 
-    const title = document.createElement('h2');
-    title.className = 'list-title';
-    title.textContent = "📋 Saved Lists Dashboard";
-    mainDisplayBox.appendChild(title);
+    // Create welcoming banner wrap
+    const container = document.createElement('div');
+    container.className = 'homepage-container';
 
-    const listNames = Object.keys(appListsData);
+    const banner = document.createElement('div');
+    banner.className = 'welcome-banner';
+    banner.innerHTML = `<h3>Welcome back!</h3><p>Select any list below to manage your items, or click 'New List' to start a new one.</p>`;
+    container.appendChild(banner);
 
-    if (listNames.length === 0) {
-        const emptyMsg = document.createElement('p');
-        emptyMsg.className = 'dashboard-empty-text';
-        emptyMsg.textContent = "No active lists found. Click 'New List' on the right panel to get started!";
-        mainDisplayBox.appendChild(emptyMsg);
-        return;
-    }
-
+    // Grid tracking layout
     const grid = document.createElement('div');
     grid.className = 'dashboard-grid';
 
-    listNames.forEach(name => {
-        const card = document.createElement('div');
-        card.className = 'dashboard-card';
-        
-        // Output title context alongside counting tracking metadata indicators
-        const itemCount = appListsData[name].length;
-        card.innerHTML = `<div>${name}</div><div style="font-size:0.85rem; font-weight:normal; margin-top:8px; opacity:0.8;">${itemCount} item${itemCount === 1 ? '' : 's'}</div>`;
-        
-        card.addEventListener('click', () => {
-            currentView = name;
-            renderInterface();
-        });
-        grid.appendChild(card);
-    });
+    const listKeys = Object.keys(appData);
 
-    mainDisplayBox.appendChild(grid);
+    if (listKeys.length === 0) {
+        const noLists = document.createElement('div');
+        noLists.className = 'no-lists-message';
+        noLists.textContent = "Your dashboard is clean. Click 'New List' to create your first tracker tracker.";
+        grid.appendChild(noLists);
+    } else {
+        listKeys.forEach(listName => {
+            const card = document.createElement('div');
+            card.className = 'list-card';
+            
+            const count = appData[listName].length;
+            card.innerHTML = `
+                <div class="list-card-title">${listName}</div>
+                <div class="list-card-count">${count} item${count === 1 ? '' : 's'} logged</div>
+            `;
+
+            // Click card to open that list view
+            card.addEventListener('click', () => {
+                currentView = listName;
+                updateAppView();
+            });
+
+            grid.appendChild(card);
+        });
+    }
+
+    container.appendChild(grid);
+    mainDisplayBox.appendChild(container);
 }
 
-// Render Engine: Active Target Shopping List Layout
+// 🛒 SCREEN TWO: Render Inside an Active Shopping List View
 function renderActiveShoppingList() {
     mainDisplayBox.innerHTML = '';
 
-    // Navigation breadcrumb link back home
-    const backHomeNav = document.createElement('span');
-    backHomeNav.className = 'home-nav-indicator';
-    backHomeNav.textContent = "← Back to Home Dashboard";
-    backHomeNav.addEventListener('click', () => {
-        currentView = "home";
-        renderInterface();
-    });
-    mainDisplayBox.appendChild(backHomeNav);
+    const listTitle = document.createElement('h2');
+    listTitle.className = 'list-title';
+    listTitle.textContent = currentView;
+    mainDisplayBox.appendChild(listTitle);
 
-    // List Header Context
-    const title = document.createElement('h2');
-    title.className = 'list-title';
-    title.textContent = currentView;
-    mainDisplayBox.appendChild(title);
-
-    // Structured List Wrapper Elements Container
     const ul = document.createElement('ul');
     ul.className = 'shopping-list';
-    ul.id = 'shoppingList';
 
-    const currentItems = appListsData[currentView];
+    const items = appData[currentView];
 
-    if (!currentItems || currentItems.length === 0) {
+    if (!items || items.length === 0) {
         const emptyMsg = document.createElement('p');
-        emptyMsg.className = 'dashboard-empty-text';
-        emptyMsg.textContent = "This list is currently empty. Add your first item using the left sidebar panel!";
+        emptyMsg.style.color = '#777';
+        emptyMsg.style.fontStyle = 'italic';
+        emptyMsg.textContent = "This list has no items yet. Use 'Add Item' to build your list.";
         mainDisplayBox.appendChild(emptyMsg);
-    } else {
-        currentItems.forEach((item, index) => {
-            const li = document.createElement('li');
-            li.className = 'list-item';
-
-            // 1. Core Square Interactive Status Box Element Component Factory 
-            const checkBox = document.createElement('div');
-            checkBox.className = 'status-square';
-            
-            if (item.completed) {
-                checkBox.style.backgroundColor = '#2ecc71';
-                checkBox.style.borderColor = '#2ecc71';
-                checkBox.innerHTML = '✓';
-            }
-
-            checkBox.addEventListener('click', (e) => {
-                e.stopPropagation(); // Shield baseline block edits triggers on toggle interactions
-                item.completed = !item.completed;
-                renderInterface();
-            });
-            li.appendChild(checkBox);
-
-            // 2. Colored Context Description Block Element Canvas Component Factory
-            const textBox = document.createElement('div');
-            textBox.className = 'item-text-box';
-            textBox.textContent = item.text;
-
-            if (item.completed) {
-                textBox.classList.add('struck-through');
-            }
-
-            // Click Text box element wrapper to launch inline title mutation prompts
-            textBox.addEventListener('click', () => {
-                const updatedText = prompt('Modify selected listing description title:', item.text);
-                if (updatedText !== null && updatedText.trim() !== '') {
-                    item.text = updatedText.trim();
-                    renderInterface();
-                }
-            });
-            li.appendChild(textBox);
-
-            // 3. Independent Destruction Element Target Button
-            const deleteItemBtn = document.createElement('button');
-            deleteItemBtn.className = 'delete-item-btn';
-            deleteItemBtn.innerHTML = '×';
-            deleteItemBtn.title = 'Remove item from list';
-            deleteItemBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                appListsData[currentView].splice(index, 1);
-                renderInterface();
-            });
-            li.appendChild(deleteItemBtn);
-
-            ul.appendChild(li);
-        });
-        
-        mainDisplayBox.appendChild(ul);
+        return;
     }
+
+    items.forEach((item, index) => {
+        const li = document.createElement('li');
+        li.className = 'list-item';
+
+        // 1. Checkbox Element Factory
+        const checkBox = document.createElement('div');
+        checkBox.className = 'status-square';
+        if (item.completed) {
+            checkBox.style.backgroundColor = '#2ecc71';
+            checkBox.style.borderColor = '#2ecc71';
+            checkBox.innerHTML = '✓';
+        }
+        checkBox.addEventListener('click', (e) => {
+            e.stopPropagation();
+            item.completed = !item.completed;
+            updateAppView();
+        });
+        li.appendChild(checkBox);
+
+        // 2. Click-to-Edit Text Container Block
+        const textBox = document.createElement('div');
+        textBox.className = 'item-text-box';
+        textBox.textContent = item.text;
+        if (item.completed) {
+            textBox.classList.add('struck-through');
+        }
+        textBox.addEventListener('click', () => {
+            const newName = prompt("Rename your entry text:", item.text);
+            if (newName !== null && newName.trim() !== "") {
+                item.text = newName.trim();
+                updateAppView();
+            }
+        });
+        li.appendChild(textBox);
+
+        // 3. Delete Single Entry Button
+        const deleteItemBtn = document.createElement('button');
+        deleteItemBtn.className = 'delete-item-btn';
+        deleteItemBtn.innerHTML = '×';
+        deleteItemBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            appData[currentView].splice(index, 1);
+            updateAppView();
+        });
+        li.appendChild(deleteItemBtn);
+
+        ul.appendChild(li);
+    });
+
+    mainDisplayBox.appendChild(ul);
 }
 
-/* --- ACTION HOOK CONTROLS EVENT HANDLERS --- */
+/* --- EVENT LISTENERS & ACTION MANAGEMENT --- */
 
-// Left Panel: Dynamic prompt appending context structures
+// Left Panel: Add individual checklist row
 addItemBtn.addEventListener('click', () => {
     if (currentView === "home") return;
+    const itemText = prompt("Enter the name of your new item:");
+    if (!itemText || itemText.trim() === "") return;
 
-    const text = prompt('Identify description parameters for new line record:');
-    if (!text || text.trim() === '') return;
-
-    appListsData[currentView].push({
-        text: text.trim(),
-        completed: false
-    });
-    renderInterface();
+    appData[currentView].push({ text: itemText.trim(), completed: false });
+    updateAppView();
 });
 
-// Left Panel: Sophisticated Multi-Tier Custom sorting router engines
+// Left Panel: Multi-option sorting processor
 sortBtn.addEventListener('click', () => {
     if (currentView === "home") return;
 
-    const sortChoice = prompt(
-        "Select Organization Metric Strategy Option Number:\n\n" +
+    const method = prompt(
+        "Choose sorting approach strategy option number:\n" +
         "1: Sort Alphabetically (A to Z)\n" +
-        "2: Sort Checked Status (Active Open items moved to top)\n" +
-        "3: Combined Hybrid (Active Alphabetical first, followed by Checked Alphabetical)"
+        "2: Sort by Checked Off status (Open items to top)\n" +
+        "3: Combine both (Open Alphabetical first, then Checked Alphabetical)"
     );
 
-    const activeList = appListsData[currentView];
+    const listRef = appData[currentView];
 
-    if (sortChoice === '1') {
-        activeList.sort((a, b) => a.text.localeCompare(b.text));
-    } else if (sortChoice === '2') {
-        activeList.sort((a, b) => a.completed - b.completed);
-    } else if (sortChoice === '3') {
-        activeList.sort((a, b) => {
-            if (a.completed !== b.completed) {
-                return a.completed - b.completed;
-            }
+    if (method === '1') {
+        listRef.sort((a, b) => a.text.localeCompare(b.text));
+    } else if (method === '2') {
+        listRef.sort((a, b) => a.completed - b.completed);
+    } else if (method === '3') {
+        listRef.sort((a, b) => {
+            if (a.completed !== b.completed) return a.completed - b.completed;
             return a.text.localeCompare(b.text);
         });
-    } else if (sortChoice !== null) {
-        alert("Selection option error matching structural parsing criteria registry rules map index.");
+    } else if (method !== null) {
+        alert("Invalid sorting selection choice entry.");
         return;
     }
-    renderInterface();
+    updateAppView();
 });
 
-// Right Panel: Instantiates tracking collections maps without dropping historic context values
+// Right Panel: Create a completely new list structure
 newListBtn.addEventListener('click', () => {
-    const freshListName = prompt('Assign title identity token identifier configuration header context:');
-    if (!freshListName || freshListName.trim() === '') return;
+    const listTitle = prompt("Enter a unique title heading for your new list:");
+    if (!listTitle || listTitle.trim() === "") return;
 
-    const parsedName = freshListName.trim();
-    if (appListsData[parsedName]) {
-        alert('A tracked shopping list container processing matching target signature properties already exists.');
+    const refinedTitle = listTitle.trim();
+    if (appData[refinedTitle]) {
+        alert("A list under that specified title properties already exists!");
         return;
     }
 
-    // Allocate configuration canvas registers map properties objects
-    appListsData[parsedName] = [];
-    currentView = parsedName;
-    renderInterface();
+    appData[refinedTitle] = [];
+    currentView = refinedTitle;
+    updateAppView();
 });
 
-// Right Panel: Redirect actions navigation contexts targeting home maps dashboard registers
-changeListBtn.addEventListener('click', () => {
+// Right Panel / Header Link: Route user view context to home grid maps
+dashboardBtn.addEventListener('click', () => {
     currentView = "home";
-    renderInterface();
+    updateAppView();
 });
-
-// Right Panel: Purges target configurations map keys arrays entirely
-deleteListBtn.addEventListener('click', () => {
-    if (currentView === "home") return;
-
-    const userConfirmation = confirm(`Are you completely sure you want to permanently delete "${currentView}" list structures?`);
-    if (!userConfirmation) return;
-
-    delete appListsData[currentView];
-    currentView = "home"; // Redirect user context safely to main landing layouts panel view space
-    renderInterface();
-});
-
-// Bind top document headline text elements layout triggers to invoke homepage view properties rerouting
 homeLink.addEventListener('click', () => {
     currentView = "home";
-    renderInterface();
+    updateAppView();
 });
 
-// Initialize Framework Application runtime loop sequences on load configurations mapping instances
-renderInterface();
+// Right Panel: Purges whole category
+deleteListBtn.addEventListener('click', () => {
+    if (currentView === "home") return;
+    const check = confirm(`Are you completely sure you want to permanently delete "${currentView}"?`);
+    if (!check) return;
+
+    delete appData[currentView];
+    currentView = "home";
+    updateAppView();
+});
+
+// Run app init engine cycle
+updateAppView();
