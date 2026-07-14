@@ -21,7 +21,7 @@ body {
     color: #333;
 }
 
-/* Three Column Layout Grid */
+/* Three Column Grid Container Scheme */
 .interface-layout {
     display: flex;
     justify-content: space-between;
@@ -29,6 +29,7 @@ body {
     gap: 20px;
 }
 
+/* Side Action Control Bar Elements Frame Column */
 .controls-left, .controls-right {
     display: flex;
     flex-direction: column;
@@ -36,7 +37,7 @@ body {
     width: 200px;
 }
 
-/* Side Buttons */
+/* Unified Platform Action Button Styles */
 .btn {
     padding: 12px 20px;
     border: none;
@@ -45,6 +46,9 @@ body {
     font-weight: bold;
     cursor: pointer;
     font-size: 1rem;
+    text-align: center;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .btn-orange { background-color: #ff7a22; }
@@ -52,7 +56,7 @@ body {
 .btn-teal { background-color: #4cd3c2; }
 .btn-red { background-color: #ff3333; }
 
-/* Central Work Board Container */
+/* Central White Board Container Canvas Frame */
 .list-display-box {
     flex-grow: 1;
     background: white;
@@ -64,14 +68,25 @@ body {
     box-sizing: border-box;
 }
 
+/* Interactive Mutable Title Header Component */
 .list-title {
     font-size: 1.8rem;
     margin-top: 0;
     margin-bottom: 25px;
     color: #333;
+    display: inline-block;
 }
 
-/* List Items Formatting */
+.editable-title-hint {
+    cursor: pointer;
+    border-bottom: 2px dashed #5b1ae2;
+}
+
+.editable-title-hint:hover {
+    color: #5b1ae2;
+}
+
+/* Core Multi-item Render Elements Framework */
 .shopping-list {
     list-style: none;
     padding: 0;
@@ -87,7 +102,7 @@ body {
     gap: 15px;
 }
 
-/* Custom Interactive Square Checkbox */
+/* Square Completion Checkbox Indicator */
 .status-square {
     width: 18px;
     height: 18px;
@@ -105,7 +120,7 @@ body {
     border-radius: 3px;
 }
 
-/* Horizontal Colored Text Canvas Blocks */
+/* Colored Horizontal Text Blocks Frame Canvas */
 .item-text-box {
     flex-grow: 1;
     padding: 10px 20px;
@@ -118,14 +133,14 @@ body {
     background-color: #5b1ae2;
 }
 
-/* Crossed Off Strikethrough Logic */
+/* Strikethrough Text Modifier Style */
 .struck-through {
     opacity: 0.6;
     background-color: #4a12b3 !important;
     text-decoration: line-through;
 }
 
-/* Delete Item Pin Button */
+/* Inline Active Element Destructive Single Row Action Pin */
 .delete-item-btn {
     background: transparent;
     border: none;
@@ -141,7 +156,7 @@ body {
     transform: scale(1.2);
 }
 
-/* --- SIMPLE HOMEPAGE COHESIVE PALETTE STYLING --- */
+/* --- SIMPLE HOMEPAGE PALETTE COMPLIANCE BOARD DESIGN --- */
 .homepage-container {
     text-align: center;
 }
@@ -153,7 +168,7 @@ body {
     margin-top: 10px;
 }
 
-/* Homepage cards share the exact same deep purple signature color as list blocks */
+/* Cards reuse the original core purple theme palette */
 .list-card {
     background: #5b1ae2;
     color: white;
@@ -163,18 +178,18 @@ body {
     cursor: pointer;
     font-weight: bold;
     transition: transform 0.2s, box-shadow 0.2s;
-    border: none;
 }
 
 .list-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 4px 12px rgba(91, 26, 226, 0.3);
+    box-shadow: 0 4px 12px rgba(91, 26, 226, 0.35);
     background-color: #4a12b3;
 }
 
 .list-card-title {
     font-size: 1.2rem;
     margin-bottom: 8px;
+    word-break: break-word;
 }
 
 .list-card-count {
