@@ -220,4 +220,46 @@ sortBtn.addEventListener('click', () => {
     renderInterface();
 });
 
-// Right Panel: Instantiates tracking collections maps without dropping hi
+// Right Panel: Instantiates tracking collections maps without dropping historic context values
+newListBtn.addEventListener('click', () => {
+    const freshListName = prompt('Assign title identity token identifier configuration header context:');
+    if (!freshListName || freshListName.trim() === '') return;
+
+    const parsedName = freshListName.trim();
+    if (appListsData[parsedName]) {
+        alert('A tracked shopping list container processing matching target signature properties already exists.');
+        return;
+    }
+
+    // Allocate configuration canvas registers map properties objects
+    appListsData[parsedName] = [];
+    currentView = parsedName;
+    renderInterface();
+});
+
+// Right Panel: Redirect actions navigation contexts targeting home maps dashboard registers
+changeListBtn.addEventListener('click', () => {
+    currentView = "home";
+    renderInterface();
+});
+
+// Right Panel: Purges target configurations map keys arrays entirely
+deleteListBtn.addEventListener('click', () => {
+    if (currentView === "home") return;
+
+    const userConfirmation = confirm(`Are you completely sure you want to permanently delete "${currentView}" list structures?`);
+    if (!userConfirmation) return;
+
+    delete appListsData[currentView];
+    currentView = "home"; // Redirect user context safely to main landing layouts panel view space
+    renderInterface();
+});
+
+// Bind top document headline text elements layout triggers to invoke homepage view properties rerouting
+homeLink.addEventListener('click', () => {
+    currentView = "home";
+    renderInterface();
+});
+
+// Initialize Framework Application runtime loop sequences on load configurations mapping instances
+renderInterface();
