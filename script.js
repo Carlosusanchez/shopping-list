@@ -1,3 +1,6 @@
+// DOM Element Selectors
+const shoppingList = document.getElementById('shoppingList');
+// Object map holding persistent data collections across runtime
 let appListsData = {
     "Weekly Groceries": [
         { text: "Fresh Milk", completed: false },
@@ -25,6 +28,28 @@ const newListBtn = document.getElementById('newListBtn');
 const changeListBtn = document.getElementById('changeListBtn');
 const deleteListBtn = document.getElementById('deleteListBtn');
 
+// Array to hold shopping list item data
+let itemsData = [
+    { text: "Milk", completed: false },
+    { text: "Eggs", completed: true },
+    { text: "Bread", completed: false }
+];
+
+// Helper function to build and render a list item DOM element
+function createListItemElement(item, index) {
+    const li = document.createElement('li');
+    li.className = 'list-item';
+
+    // 1. Create the checkbox container (the small square box)
+    const checkBox = document.createElement('div');
+    checkBox.className = 'status-square';
+    
+    // Add custom styling inline to handle the green check mark when completed
+    if (item.completed) {
+        checkBox.style.backgroundColor = '#2ecc71';
+        checkBox.style.borderColor = '#2ecc71';
+        checkBox.style.position = 'relative';
+        checkBox.innerHTML = '<span style="color: white; font-size: 12px; position: absolute; top: -1px; left: 3px;">✓</span>';
 // Primary UI Switch Routing engine
 function renderInterface() {
     if (currentView === "home") {
@@ -32,14 +57,23 @@ function renderInterface() {
         leftSidebar.style.visibility = "hidden";
         deleteListBtn.style.display = "none";
         renderHomeDashboard();
-    } else {
+} else {
+        checkBox.style.backgroundColor = 'transparent';
+        checkBox.innerHTML = '';
         // Display list contextual settings 
         leftSidebar.style.visibility = "visible";
         deleteListBtn.style.display = "block";
         renderActiveShoppingList();
-    }
+}
 }
 
+    // Toggle complete/incomplete when clicking the square box
+    checkBox.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevents triggering the text edit behavior
+        item.completed = !item.completed;
+        renderList();
+    });
+    li.appendChild(checkBox);
 // Render Engine: Home Dashboard Grid
 function renderHomeDashboard() {
     mainDisplayBox.innerHTML = '';
@@ -49,16 +83,30 @@ function renderHomeDashboard() {
     title.textContent = "📋 Saved Lists Dashboard";
     mainDisplayBox.appendChild(title);
 
+    // 2. Create the text container block
+    const textBox = document.createElement('div');
+    textBox.className = 'item-text-box purple-bg';
+    textBox.textContent = item.text;
     const listNames = Object.keys(appListsData);
 
+    // Apply strikethrough logic if completed
+    if (item.completed) {
+        textBox.classList.add('struck-through');
     if (listNames.length === 0) {
         const emptyMsg = document.createElement('p');
         emptyMsg.className = 'dashboard-empty-text';
         emptyMsg.textContent = "No active lists found. Click 'New List' on the right panel to get started!";
         mainDisplayBox.appendChild(emptyMsg);
         return;
-    }
+}
 
+    // Inline Edit Feature: Click the text block to rename the item
+    textBox.addEventListener('click', () => {
+        const updatedText = prompt('Edit your item name:', item.text);
+        if (updatedText !== null && updatedText.trim() !== '') {
+            item.text = updatedText.trim();
+            renderList();
+        }
     const grid = document.createElement('div');
     grid.className = 'dashboard-grid';
 
@@ -75,11 +123,19 @@ function renderHomeDashboard() {
             renderInterface();
         });
         grid.appendChild(card);
-    });
+});
 
+    li.appendChild(textBox);
+    return li;
     mainDisplayBox.appendChild(grid);
 }
 
+// Function to render the complete array data into the view container
+function renderList() {
+    shoppingList.innerHTML = '';
+    itemsData.forEach((item, index) => {
+        const itemElement = createListItemElement(item, index);
+        shoppingList.appendChild(itemElement);
 // Render Engine: Active Target Shopping List Layout
 function renderActiveShoppingList() {
     mainDisplayBox.innerHTML = '';
@@ -91,31 +147,13 @@ function renderActiveShoppingList() {
     backHomeNav.addEventListener('click', () => {
         currentView = "home";
         renderInterface();
-    });
+});
     mainDisplayBox.appendChild(backHomeNav);
 
     // List Header Context
     const title = document.createElement('h2');
     title.className = 'list-title';
-    title.style.cursor = 'pointer';
     title.textContent = currentView;
-    title.title = "Click to rename this list";
-    
-    title.addEventListener('click', () => {
-        const newListName = prompt("Enter a new name for this list:", currentView);
-        if (!newListName || newListName.trim() === "" || newListName.trim() === currentView) return;
-        
-        const cleanName = newListName.trim();
-        if (appListsData[cleanName]) {
-            alert("A list with that name already exists!");
-            return;
-        }
-
-        appListsData[cleanName] = appListsData[currentView];
-        delete appListsData[currentView];
-        currentView = cleanName;
-        renderInterface();
-    });
     mainDisplayBox.appendChild(title);
 
     // Structured List Wrapper Elements Container
@@ -146,7 +184,7 @@ function renderActiveShoppingList() {
             }
 
             checkBox.addEventListener('click', (e) => {
-                e.stopPropagation(); 
+                e.stopPropagation(); // Shield baseline block edits triggers on toggle interactions
                 item.completed = !item.completed;
                 renderInterface();
             });
@@ -171,7 +209,7 @@ function renderActiveShoppingList() {
             });
             li.appendChild(textBox);
 
-            // 3. Independent Destruction Element Target Button (Integrated Cleanly)
+            // 3. Independent Destruction Element Target Button
             const deleteItemBtn = document.createElement('button');
             deleteItemBtn.className = 'delete-item-btn';
             deleteItemBtn.innerHTML = '×';
@@ -190,24 +228,34 @@ function renderActiveShoppingList() {
     }
 }
 
+// Event Listener: Add new item via prompt window
 /* --- ACTION HOOK CONTROLS EVENT HANDLERS --- */
 
 // Left Panel: Dynamic prompt appending context structures
 addItemBtn.addEventListener('click', () => {
+    const text = prompt('Enter new item name:');
     if (currentView === "home") return;
 
     const text = prompt('Identify description parameters for new line record:');
-    if (!text || text.trim() === '') return;
+if (!text || text.trim() === '') return;
 
+    const newItem = {
     appListsData[currentView].push({
-        text: text.trim(),
-        completed: false
+text: text.trim(),
+completed: false
+    };
+
+    itemsData.push(newItem);
+    renderList();
     });
     renderInterface();
 });
 
+// Event Listener: Sort elements alphabetically
 // Left Panel: Sophisticated Multi-Tier Custom sorting router engines
 sortBtn.addEventListener('click', () => {
+    itemsData.sort((a, b) => a.text.localeCompare(b.text));
+    renderList();
     if (currentView === "home") return;
 
     const sortChoice = prompt(
@@ -248,6 +296,7 @@ newListBtn.addEventListener('click', () => {
         return;
     }
 
+    // Allocate configuration canvas registers map properties objects
     appListsData[parsedName] = [];
     currentView = parsedName;
     renderInterface();
@@ -267,3 +316,17 @@ deleteListBtn.addEventListener('click', () => {
     if (!userConfirmation) return;
 
     delete appListsData[currentView];
+    currentView = "home"; // Redirect user context safely to main landing layouts panel view space
+    renderInterface();
+});
+
+// Bind top document headline text elements layout triggers to invoke homepage view properties rerouting
+homeLink.addEventListener('click', () => {
+    currentView = "home";
+    renderInterface();
+});
+
+// Initial boot load to populate list
+renderList();
+// Initialize Framework Application runtime loop sequences on load configurations mapping instances
+renderInterface();
