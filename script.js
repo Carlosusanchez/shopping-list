@@ -1,5 +1,5 @@
 // DOM Element Selectors
-const shoppingList = document.getElementById('shoppingList');
+const shoppingList = document.getElementById('mainDisplayBox');
 const addItemBtn = document.getElementById('addItemBtn');
 const sortBtn = document.getElementById('sortBtn');
 
