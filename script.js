@@ -1,3 +1,4 @@
+// --- DATABASE & APP STATE ---
 let appData = JSON.parse(localStorage.getItem('trackerLists')) || {
     "Weekly Groceries": [
         { text: "Milk", completed: false },
@@ -10,8 +11,9 @@ let appData = JSON.parse(localStorage.getItem('trackerLists')) || {
     ]
 };
 
-// Start application pointing directly to the first active tracking list
-let activeListKey = Object.keys(appData)[0] || null;
+// FIX: Grab the first available list string cleanly instead of the whole array
+const existingKeys = Object.keys(appData);
+let activeListKey = existingKeys.length > 0 ? existingKeys[0] : null;
 
 // --- DOM CONFIGURATION INTERFACE ---
 const mainDisplayBox = document.getElementById('mainDisplayBox');
@@ -66,7 +68,7 @@ function renderDashboardView() {
     mainDisplayBox.appendChild(gridLayout);
 }
 
-// Displays lines inside an selected tracked shopping folder
+// Displays lines inside a selected tracked shopping folder
 function renderActiveListView() {
     if (!activeListKey || !appData[activeListKey]) {
         renderDashboardView();
@@ -142,11 +144,20 @@ function renderActiveListView() {
 // --- INTERACTIVE EVENT LISTENERS ---
 
 addItemBtn.addEventListener('click', () => {
+    // FAIL-SAFE: If no list is open, create or select one automatically so adding works
     if (!activeListKey) {
-        alert('Select or create an active shopping list dashboard card first.');
-        return;
+        const keys = Object.keys(appData);
+        if (keys.length > 0) {
+            activeListKey = keys[0];
+        } else {
+            const autoTitle = prompt('You do not have a list open. Enter a title to create one:');
+            if (!autoTitle || autoTitle.trim() === '') return;
+            activeListKey = autoTitle.trim();
+            appData[activeListKey] = [];
+        }
     }
-    const itemLabel = prompt('Enter item name:');
+    
+    const itemLabel = prompt(`Adding item to "${activeListKey}". Enter item name:`);
     if (!itemLabel || itemLabel.trim() === '') return;
 
     appData[activeListKey].push({ text: itemLabel.trim(), completed: false });
@@ -189,7 +200,7 @@ deleteListBtn.addEventListener('click', () => {
         delete appData[activeListKey];
         syncStorage();
         const availableLists = Object.keys(appData);
-        activeListKey = availableLists.length > 0 ? availableLists[0] : null;
+        activeListKey = availableLists.length > 0 ? availableLists : null;
         if (activeListKey) {
             renderActiveListView();
         } else {
