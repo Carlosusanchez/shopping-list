@@ -294,3 +294,4 @@ deleteListBtn.addEventListener('click', () => {
 
     if (currentView === 'list') {
         userLists.splice(activeListIndex, 1);
+currentView = 'dashboard';} else {userLists.pop();}activeListIndex = Math.max(0, userLists.length - 1);searchQuery = "";saveToStorage();renderApp();});homeLink.addEventListener('click', () => {currentView = 'dashboard';searchQuery = "";renderApp();});// App Initiation InitializedrenderApp();
