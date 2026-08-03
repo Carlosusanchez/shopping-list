@@ -1,3 +1,4 @@
+/* Base Resets & Layout Core */
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f7f6;
@@ -93,7 +94,6 @@ body {
     display: flex;
     align-items: center;
     gap: 15px;
-    margin-bottom: 10px;
 }
 
 /* Custom Interactive Square Checkbox */
@@ -124,7 +124,7 @@ body {
     text-align: left;
     cursor: pointer;
     user-select: none;
-    background-color: #5b1ae2;
+    background-color: #5b1ae2; /* Base purple-bg class default */
 }
 
 /* Checked Off Strikethrough State Modification */
@@ -182,3 +182,13 @@ body {
     font-style: italic;
     margin-top: 40px;
 }
+
+.home-nav-indicator {
+    display: inline-block;
+    color: #5b1ae2;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 15px;
+    text-decoration: underline;
+}
+
