@@ -92,3 +92,4 @@ sortBtn.addEventListener('click', () => {
 
 // Initial boot load to populate list
 renderList();
+
