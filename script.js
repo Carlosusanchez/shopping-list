@@ -11,56 +11,47 @@ const deleteListBtn = document.getElementById('deleteListBtn');
 // System Core State
 let currentView = 'dashboard'; 
 let activeListIndex = 0;
-let searchQuery = ""; // Tracks what the user is typing to filter elements
+let searchQuery = ""; // Simple text filter variable
 
-// Central Data Layer with localStorage fallback
+// Central Data Layer with localStorage integration
 let userLists = [];
 
-// Triple-checked validation block to safely load data without crashing if storage is corrupt
-try {
-    const savedData = localStorage.getItem('shoppingTrackerData');
-    if (savedData) {
-        userLists = JSON.parse(savedData);
-    } else {
-        // Default starter data if completely fresh load
-        userLists = [
-            {
-                name: "Weekly Groceries",
-                items: [
-                    { text: "Milk", completed: false },
-                    { text: "Eggs", completed: true },
-                    { text: "Bread", completed: false }
-                ]
-            },
-            {
-                name: "Hardware Store",
-                items: [
-                    { text: "Drywall Screws", completed: false },
-                    { text: "Paint Brush", completed: false }
-                ]
-            }
-        ];
-    }
-} catch (e) {
-    console.error("Storage read failed, resetting to empty system.", e);
-    userLists = [];
+// 1. SAFE STORAGE LOAD
+const savedData = localStorage.getItem('shoppingTrackerData');
+if (savedData) {
+    userLists = JSON.parse(savedData);
+} else {
+    // Default starter boards if localStorage is clean
+    userLists = [
+        {
+            name: "Weekly Groceries",
+            items: [
+                { text: "Milk", completed: false },
+                { text: "Eggs", completed: true },
+                { text: "Bread", completed: false }
+            ]
+        },
+        {
+            name: "Hardware Store",
+            items: [
+                { text: "Drywall Screws", completed: false },
+                { text: "Paint Brush", completed: false }
+            ]
+        }
+    ];
 }
 
-// Uncomplicated helper function to save current state safely
+// 2. SAFE STORAGE SAVE
 function saveToStorage() {
-    try {
-        localStorage.setItem('shoppingTrackerData', JSON.stringify(userLists));
-    } catch (e) {
-        console.error("Failed to write to local storage.", e);
-    }
+    localStorage.setItem('shoppingTrackerData', JSON.stringify(userLists));
 }
 
-// Helper function to build a single list item line matching your CSS layout perfectly
+// Helper function to build a single list item line matching your CSS layout
 function createListItemElement(item, itemIndex, listItemsArray) {
     const li = document.createElement('li');
     li.className = 'list-item';
 
-    // 1. Interactive Checkbox Square (.status-square)
+    // Interactive Checkbox Square (.status-square)
     const checkBox = document.createElement('div');
     checkBox.className = 'status-square';
     
@@ -78,7 +69,7 @@ function createListItemElement(item, itemIndex, listItemsArray) {
     });
     li.appendChild(checkBox);
 
-    // 2. Main Title Canvas Block (.item-text-box)
+    // Main Title Canvas Block (.item-text-box)
     const textBox = document.createElement('div');
     textBox.className = 'item-text-box';
     textBox.textContent = item.text;
@@ -97,7 +88,7 @@ function createListItemElement(item, itemIndex, listItemsArray) {
     });
     li.appendChild(textBox);
 
-    // 3. Destructive Action Pin Button (.delete-item-btn)
+    // Destructive Action Pin Button (.delete-item-btn)
     const deleteBtn = document.createElement('button');
     deleteBtn.className = 'delete-item-btn';
     deleteBtn.innerHTML = '×'; 
@@ -114,97 +105,37 @@ function createListItemElement(item, itemIndex, listItemsArray) {
     return li;
 }
 
-// Shared helper function to inject an uncomplicated, clean search bar matching layout specs
-function injectSearchBar(placeholderText) {
-    const searchInput = document.createElement('input');
-    searchInput.type = 'text';
-    searchInput.placeholder = placeholderText;
-    searchInput.value = searchQuery;
+// Helper function to create the simple search input field
+function createSearchInputElement(placeholderText) {
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = placeholderText;
+    input.value = searchQuery;
     
-    // Minimalistic style fallback so it fits cleanly in your display boxes
-    searchInput.style.width = '100%';
-    searchInput.style.padding = '10px';
-    searchInput.style.marginBottom = '20px';
-    searchInput.style.border = '1px solid #ccc';
-    searchInput.style.borderRadius = '20px';
-    searchInput.style.boxSizing = 'border-box';
-    searchInput.style.fontSize = '1rem';
+    // Fallback styles to ensure it looks balanced in the display board
+    input.style.width = '100%';
+    input.style.padding = '10px 15px';
+    input.style.marginBottom = '20px';
+    input.style.border = '1px solid #ccc';
+    input.style.borderRadius = '20px';
+    input.style.boxSizing = 'border-box';
+    input.style.fontSize = '1rem';
 
-    // Listens to user keystrokes, updates the search query, and updates the display immediately
-    searchInput.addEventListener('input', (e) => {
+    // Re-renders the display instantly as you type
+    input.addEventListener('input', (e) => {
         searchQuery = e.target.value;
-        
-        // Target structural elements directly to prevent complete screen redraw flashes while typing
-        if (currentView === 'dashboard') {
-            filterDashboardCards();
-        } else {
-            filterListRows();
-        }
+        renderApp();
+        // Keeps the cursor focus in the input while typing
+        input.focus();
     });
 
-    mainDisplayBox.appendChild(searchInput);
+    return input;
 }
 
-// Live-filters dashboard container structures based on search keys without resetting focused inputs
-function filterDashboardCards() {
-    const grid = mainDisplayBox.querySelector('.dashboard-grid');
-    if (!grid) return;
-    grid.innerHTML = '';
-
-    const cleanQuery = searchQuery.toLowerCase().trim();
-    let visibleCardsCount = 0;
-
-    userLists.forEach((list, idx) => {
-        if (cleanQuery && !list.name.toLowerCase().includes(cleanQuery)) return;
-        visibleCardsCount++;
-
-        const card = document.createElement('div');
-        card.className = 'dashboard-card';
-        const incompleteCount = list.items.filter(i => !i.completed).length;
-        card.innerHTML = `${list.name}<br><span style="font-size: 0.8rem; font-weight: normal; opacity: 0.7;">(${incompleteCount} items left)</span>`;
-
-        card.addEventListener('click', () => {
-            activeListIndex = idx;
-            currentView = 'list';
-            searchQuery = ""; // Auto-clear search query when jumping scopes
-            renderApp();
-        });
-        grid.appendChild(card);
-    });
-
-    // Handle structural warnings if search results return zero boards
-    let emptyWarning = mainDisplayBox.querySelector('.dashboard-empty-text');
-    if (visibleCardsCount === 0) {
-        if (!emptyWarning) {
-            emptyWarning = document.createElement('p');
-            emptyWarning.className = 'dashboard-empty-text';
-            mainDisplayBox.appendChild(emptyWarning);
-        }
-        emptyWarning.textContent = 'No matching boards found.';
-    } else if (emptyWarning) {
-        emptyWarning.remove();
-    }
-}
-
-// Live-filters individual row rows based on search keys without resetting focused inputs
-function filterListRows() {
-    const ul = mainDisplayBox.querySelector('.shopping-list');
-    if (!ul) return;
-    ul.innerHTML = '';
-
-    const targetList = userLists[activeListIndex];
-    const cleanQuery = searchQuery.toLowerCase().trim();
-
-    targetList.items.forEach((item, index) => {
-        if (cleanQuery && !item.text.toLowerCase().includes(cleanQuery)) return;
-        const liElement = createListItemElement(item, index, targetList.items);
-        ul.appendChild(liElement);
-    });
-}
-
-// Master Rendering Hub orchestrating structural views based on layout state variables
+// Master Rendering Hub (The exact framework that worked before, cleanly updated)
 function renderApp() {
     mainDisplayBox.innerHTML = '';
+    const lowerQuery = searchQuery.toLowerCase().trim();
 
     if (currentView === 'dashboard') {
         // --- Render Dashboard Canvas View ---
@@ -213,20 +144,49 @@ function renderApp() {
         heading.textContent = 'Your Shopping Boards';
         mainDisplayBox.appendChild(heading);
 
-        // Inject Search Bar targeting list collections
-        injectSearchBar('🔍 Search shopping boards...');
+        // Inject Search Bar
+        const searchInput = createSearchInputElement('🔍 Search shopping boards...');
+        mainDisplayBox.appendChild(searchInput);
+        // Maintain cursor focus stability across immediate screen redraws
+        if (searchQuery !== "") searchInput.focus();
 
         const gridContainer = document.createElement('div');
         gridContainer.className = 'dashboard-grid';
+
+        let visibleCards = 0;
+
+        userLists.forEach((list, idx) => {
+            // Filter rule logic: skip card if it doesn't match search term
+            if (lowerQuery && !list.name.toLowerCase().includes(lowerQuery)) return;
+            visibleCards++;
+
+            const card = document.createElement('div');
+            card.className = 'dashboard-card';
+            
+            const incompleteCount = list.items.filter(i => !i.completed).length;
+            card.innerHTML = `${list.name}<br><span style="font-size: 0.8rem; font-weight: normal; opacity: 0.7;">(${incompleteCount} items left)</span>`;
+
+            card.addEventListener('click', () => {
+                activeListIndex = idx;
+                currentView = 'list';
+                searchQuery = ""; // Clear text field when entering a list
+                renderApp();
+            });
+            gridContainer.appendChild(card);
+        });
+
         mainDisplayBox.appendChild(gridContainer);
 
-        if (userLists.length === 0) {
+        if (visibleCards === 0 && userLists.length > 0) {
+            const noResults = document.createElement('p');
+            noResults.className = 'dashboard-empty-text';
+            noResults.textContent = 'No matching boards found.';
+            mainDisplayBox.appendChild(noResults);
+        } else if (userLists.length === 0) {
             const emptyText = document.createElement('p');
             emptyText.className = 'dashboard-empty-text';
             emptyText.textContent = 'No active shopping tracker boards found. Click "New List" to start!';
             mainDisplayBox.appendChild(emptyText);
-        } else {
-            filterDashboardCards();
         }
 
         changeListBtn.textContent = "Go to Active List";
@@ -257,14 +217,23 @@ function renderApp() {
         heading.textContent = targetList.name;
         mainDisplayBox.appendChild(heading);
 
-        // Inject Search Bar targeting list items
-        injectSearchBar(`🔍 Search items in ${targetList.name}...`);
+        // Inject Search Bar
+        const searchInput = createSearchInputElement(`🔍 Search items in ${targetList.name}...`);
+        mainDisplayBox.appendChild(searchInput);
+        if (searchQuery !== "") searchInput.focus();
 
         const ul = document.createElement('ul');
         ul.className = 'shopping-list';
-        mainDisplayBox.appendChild(ul);
 
-        filterListRows();
+        targetList.items.forEach((item, index) => {
+            // Filter rule logic: skip row if it doesn't match search term
+            if (lowerQuery && !item.text.toLowerCase().includes(lowerQuery)) return;
+            
+            const liElement = createListItemElement(item, index, targetList.items);
+            ul.appendChild(liElement);
+        });
+
+        mainDisplayBox.appendChild(ul);
         changeListBtn.textContent = "Go to Dashboard";
     }
 }
@@ -286,3 +255,42 @@ addItemBtn.addEventListener('click', () => {
     saveToStorage();
     renderApp();
 });
+
+sortBtn.addEventListener('click', () => {
+    if (currentView !== 'list') return;
+    userLists[activeListIndex].items.sort((a, b) => a.text.localeCompare(b.text));
+    saveToStorage();
+    renderApp();
+});
+
+changeListBtn.addEventListener('click', () => {
+    currentView = (currentView === 'list') ? 'dashboard' : 'list';
+    searchQuery = ""; 
+    renderApp();
+});
+
+newListBtn.addEventListener('click', () => {
+    const listName = prompt('Enter a name for your new shopping list:');
+    if (!listName || listName.trim() === '') return;
+
+    const newListObj = {
+        name: listName.trim(),
+        items: []
+    };
+
+    userLists.push(newListObj);
+    activeListIndex = userLists.length - 1;
+    currentView = 'list';
+    searchQuery = ""; 
+    saveToStorage();
+    renderApp();
+});
+
+deleteListBtn.addEventListener('click', () => {
+    if (userLists.length === 0) return;
+    
+    const confirmation = confirm(`Are you sure you want to permanently delete the current list container?`);
+    if (!confirmation) return;
+
+    if (currentView === 'list') {
+        userLists.splice(activeListIndex, 1);
