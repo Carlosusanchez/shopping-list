@@ -1,18 +1,19 @@
-let listsData = JSON.parse(localStorage.getItem('shopTrackerData')) || {
-    "Grocery List": [
+let appData = JSON.parse(localStorage.getItem('trackerLists')) || {
+    "Weekly Groceries": [
         { text: "Milk", completed: false },
         { text: "Eggs", completed: true },
         { text: "Bread", completed: false }
     ],
-    "School Supplies": [
-        { text: "Notebooks", completed: false },
-        { text: "Pens", completed: false }
+    "School Projects": [
+        { text: "Finish Coding Layout", completed: false },
+        { text: "Write Project Report", completed: false }
     ]
 };
 
-let currentListKey = "Grocery List"; // Tracks active list name. Set to null for Dashboard View.
+// Start application pointing directly to the first active tracking list
+let activeListKey = Object.keys(appData)[0] || null;
 
-// --- DOM ELEMENT SELECTORS ---
+// --- DOM CONFIGURATION INTERFACE ---
 const mainDisplayBox = document.getElementById('mainDisplayBox');
 const addItemBtn = document.getElementById('addItemBtn');
 const sortBtn = document.getElementById('sortBtn');
@@ -21,173 +22,185 @@ const changeListBtn = document.getElementById('changeListBtn');
 const deleteListBtn = document.getElementById('deleteListBtn');
 const homeLink = document.getElementById('homeLink');
 
-// --- HELPER FUNCTIONS ---
-function saveToStorage() {
-    localStorage.setItem('shopTrackerData', JSON.stringify(listsData));
+// --- APP UTILITIES ---
+function syncStorage() {
+    localStorage.setItem('trackerLists', JSON.stringify(appData));
 }
 
-// Builds individual shopping items (with checkbox, text canvas, and deletion pin)
-function createListItemElement(item, index, listKey) {
-    const li = document.createElement('li');
-    li.className = 'list-item';
+// --- VIEW CONTROLLERS ---
 
-    // 1. Interactive Checkbox Square
-    const checkBox = document.createElement('div');
-    checkBox.className = 'status-square';
-    if (item.completed) {
-        checkBox.style.backgroundColor = '#2ecc71';
-        checkBox.style.borderColor = '#2ecc71';
-        checkBox.style.position = 'relative';
-        checkBox.innerHTML = '<span style="color: white; font-size: 12px; position: absolute; top: -1px; left: 3px;">✓</span>';
-    }
-    checkBox.addEventListener('click', (e) => {
-        e.stopPropagation();
-        item.completed = !item.completed;
-        saveToStorage();
-        renderView();
-    });
-    li.appendChild(checkBox);
-
-    // 2. Text Content Canvas Block
-    const textBox = document.createElement('div');
-    textBox.className = 'item-text-box';
-    textBox.textContent = item.text;
-    if (item.completed) {
-        textBox.classList.add('struck-through');
-    }
-    textBox.addEventListener('click', () => {
-        const updatedText = prompt('Edit item name:', item.text);
-        if (updatedText && updatedText.trim() !== '') {
-            item.text = updatedText.trim();
-            saveToStorage();
-            renderView();
-        }
-    });
-    li.appendChild(textBox);
-
-    // 3. Individual Deletion Pin
-    const deletePin = document.createElement('button');
-    deletePin.className = 'delete-item-btn';
-    deletePin.innerHTML = '&times;';
-    deletePin.setAttribute('aria-label', `Delete ${item.text}`);
-    deletePin.addEventListener('click', () => {
-        listsData[listKey].splice(index, 1);
-        saveToStorage();
-        renderView();
-    });
-    li.appendChild(deletePin);
-
-    return li;
-}
-
-// --- RENDER CORE CONTROLLER ---
-function renderView() {
+// Displays dashboard cards showing every individual tracker file
+function renderDashboardView() {
+    activeListKey = null;
     mainDisplayBox.innerHTML = '';
 
-    // VIEW A: Render Dashboard Grid (If currentListKey is null)
-    if (!currentListKey || !listsData[currentListKey]) {
-        currentListKey = null;
-        
-        const title = document.createElement('h2');
-        title.className = 'list-title';
-        title.textContent = 'Your Storage Dashboard';
-        mainDisplayBox.appendChild(title);
+    const heading = document.createElement('h2');
+    heading.className = 'list-title';
+    heading.textContent = 'Digital Storage Dashboard';
+    mainDisplayBox.appendChild(heading);
 
-        const keys = Object.keys(listsData);
-        if (keys.length === 0) {
-            const emptyText = document.createElement('p');
-            emptyText.className = 'dashboard-empty-text';
-            emptyText.textContent = 'No active tracking lists found. Create one to get started!';
-            mainDisplayBox.appendChild(emptyText);
-            return;
-        }
-
-        const grid = document.createElement('div');
-        grid.className = 'dashboard-grid';
-
-        keys.forEach(key => {
-            const card = document.createElement('div');
-            card.className = 'dashboard-card';
-            card.textContent = `${key} (${listsData[key].length})`;
-            card.addEventListener('click', () => {
-                currentListKey = key;
-                renderView();
-            });
-            grid.appendChild(card);
-        });
-
-        mainDisplayBox.appendChild(grid);
+    const keys = Object.keys(appData);
+    if (keys.length === 0) {
+        const fallbackMessage = document.createElement('p');
+        fallbackMessage.className = 'dashboard-empty-text';
+        fallbackMessage.textContent = 'No tracking lists found. Click "New List" to start tracker.';
+        mainDisplayBox.appendChild(fallbackMessage);
         return;
     }
 
-    // VIEW B: Render Active Shopping List
-    const title = document.createElement('h2');
-    title.className = 'list-title';
-    title.textContent = currentListKey;
-    mainDisplayBox.appendChild(title);
+    const gridLayout = document.createElement('div');
+    gridLayout.className = 'dashboard-grid';
 
-    const ul = document.createElement('ul');
-    ul.className = 'shopping-list';
-
-    listsData[currentListKey].forEach((item, index) => {
-        const li = createListItemElement(item, index, currentListKey);
-        ul.appendChild(li);
+    keys.forEach(nameKey => {
+        const listCard = document.createElement('div');
+        listCard.className = 'dashboard-card';
+        listCard.textContent = `${nameKey} (${appData[nameKey].length} items)`;
+        
+        listCard.addEventListener('click', () => {
+            activeListKey = nameKey;
+            renderActiveListView();
+        });
+        gridLayout.appendChild(listCard);
     });
 
-    mainDisplayBox.appendChild(ul);
+    mainDisplayBox.appendChild(gridLayout);
 }
 
-// --- GLOBAL EVENT LISTENERS ---
-addItemBtn.addEventListener('click', () => {
-    if (!currentListKey) return alert('Please select or create an active tracking list first!');
-    const text = prompt('Enter new item name:');
-    if (!text || text.trim() === '') return;
+// Displays lines inside an selected tracked shopping folder
+function renderActiveListView() {
+    if (!activeListKey || !appData[activeListKey]) {
+        renderDashboardView();
+        return;
+    }
 
-    listsData[currentListKey].push({ text: text.trim(), completed: false });
-    saveToStorage();
-    renderView();
+    mainDisplayBox.innerHTML = '';
+
+    const listTitle = document.createElement('h2');
+    listTitle.className = 'list-title';
+    listTitle.textContent = activeListKey;
+    mainDisplayBox.appendChild(listTitle);
+
+    const itemContainerUL = document.createElement('ul');
+    itemContainerUL.className = 'shopping-list';
+
+    appData[activeListKey].forEach((itemObject, itemIndex) => {
+        const itemLI = document.createElement('li');
+        itemLI.className = 'list-item';
+
+        // Checkbox square
+        const checkSquare = document.createElement('div');
+        checkSquare.className = 'status-square';
+        if (itemObject.completed) {
+            checkSquare.style.backgroundColor = '#2ecc71';
+            checkSquare.style.borderColor = '#2ecc71';
+            checkSquare.style.position = 'relative';
+            checkSquare.innerHTML = '<span style="color:white; font-size:12px; position:absolute; top:-2px; left:2px;">✓</span>';
+        }
+        checkSquare.addEventListener('click', (event) => {
+            event.stopPropagation();
+            itemObject.completed = !itemObject.completed;
+            syncStorage();
+            renderActiveListView();
+        });
+
+        // Item title canvas plate
+        const visualTextCanvas = document.createElement('div');
+        visualTextCanvas.className = 'item-text-box';
+        visualTextCanvas.textContent = itemObject.text;
+        if (itemObject.completed) {
+            visualTextCanvas.classList.add('struck-through');
+        }
+        visualTextCanvas.addEventListener('click', () => {
+            const freshName = prompt('Update item label:', itemObject.text);
+            if (freshName && freshName.trim() !== '') {
+                itemObject.text = freshName.trim();
+                syncStorage();
+                renderActiveListView();
+            }
+        });
+
+        // Delete structural single items button
+        const itemTrashButton = document.createElement('button');
+        itemTrashButton.className = 'delete-item-btn';
+        itemTrashButton.innerHTML = '&times;';
+        itemTrashButton.addEventListener('click', (event) => {
+            event.stopPropagation();
+            appData[activeListKey].splice(itemIndex, 1);
+            syncStorage();
+            renderActiveListView();
+        });
+
+        itemLI.appendChild(checkSquare);
+        itemLI.appendChild(visualTextCanvas);
+        itemLI.appendChild(itemTrashButton);
+        itemContainerUL.appendChild(itemLI);
+    });
+
+    mainDisplayBox.appendChild(itemContainerUL);
+}
+
+// --- INTERACTIVE EVENT LISTENERS ---
+
+addItemBtn.addEventListener('click', () => {
+    if (!activeListKey) {
+        alert('Select or create an active shopping list dashboard card first.');
+        return;
+    }
+    const itemLabel = prompt('Enter item name:');
+    if (!itemLabel || itemLabel.trim() === '') return;
+
+    appData[activeListKey].push({ text: itemLabel.trim(), completed: false });
+    syncStorage();
+    renderActiveListView();
 });
 
 sortBtn.addEventListener('click', () => {
-    if (!currentListKey) return;
-    listsData[currentListKey].sort((a, b) => a.text.localeCompare(b.text));
-    saveToStorage();
-    renderView();
+    if (!activeListKey) return;
+    appData[activeListKey].sort((alpha, beta) => alpha.text.localeCompare(beta.text));
+    syncStorage();
+    renderActiveListView();
 });
 
 newListBtn.addEventListener('click', () => {
-    const listName = prompt('Enter a title for your new tracking list:');
-    if (!listName || listName.trim() === '') return;
-    
-    const formattedName = listName.trim();
-    if (listsData[formattedName]) return alert('A list with that name already exists!');
+    const listTitleInput = prompt('Enter a title for your new shopping tracking board:');
+    if (!listTitleInput || listTitleInput.trim() === '') return;
 
-    listsData[formattedName] = [];
-    currentListKey = formattedName;
-    saveToStorage();
-    renderView();
+    const refinedTitle = listTitleInput.trim();
+    if (appData[refinedTitle]) {
+        alert('A tracking dashboard list already uses that name.');
+        return;
+    }
+
+    appData[refinedTitle] = [];
+    activeListKey = refinedTitle;
+    syncStorage();
+    renderActiveListView();
 });
 
-changeListBtn.addEventListener('click', () => {
-    currentListKey = null;
-    renderView();
-});
-
-homeLink.addEventListener('click', () => {
-    currentListKey = null;
-    renderView();
-});
+changeListBtn.addEventListener('click', renderDashboardView);
+homeLink.addEventListener('click', renderDashboardView);
 
 deleteListBtn.addEventListener('click', () => {
-    if (!currentListKey) return alert('No active list selected to delete.');
-    if (confirm(`Are you sure you want to permanently delete "${currentListKey}"?`)) {
-        delete listsData[currentListKey];
-        const remainingKeys = Object.keys(listsData);
-        currentListKey = remainingKeys.length > 0 ? remainingKeys[0] : null;
-        saveToStorage();
-        renderView();
+    if (!activeListKey) {
+        alert('No active shopping canvas list selected to delete.');
+        return;
+    }
+    if (confirm(`Permanently delete current list: "${activeListKey}"?`)) {
+        delete appData[activeListKey];
+        syncStorage();
+        const availableLists = Object.keys(appData);
+        activeListKey = availableLists.length > 0 ? availableLists[0] : null;
+        if (activeListKey) {
+            renderActiveListView();
+        } else {
+            renderDashboardView();
+        }
     }
 });
 
-// Initial boot launch sequence
-renderView();
+// --- CORE BOOT INITIALIZATION ---
+if (activeListKey) {
+    renderActiveListView();
+} else {
+    renderDashboardView();
+}
